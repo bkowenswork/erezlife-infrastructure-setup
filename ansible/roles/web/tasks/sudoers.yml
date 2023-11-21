@@ -1,0 +1,6 @@
+---
+- name: Copy files over for sudoers.d
+  copy:
+    src: roles/web/files/sudoers.d/
+    dest: /etc/sudoers.d/
+    mode: 0440

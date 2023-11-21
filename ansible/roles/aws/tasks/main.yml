@@ -1,0 +1,17 @@
+---
+- name: Include AWS variables
+  include_vars:
+    file: aws_passwords.yml
+
+- name: Create AWS CLI config directory
+  become_user: "{{ aws_user }}"
+  file:
+    path: ~/.aws
+    state: directory
+
+- name: Create AWS credentials
+  become_user: "{{ aws_user }}"
+  template:
+    src: aws_credentials.j2
+    dest: ~/.aws/credentials
+    mode: 0600

@@ -1,0 +1,37 @@
+---
+- import_role:
+    name: docker
+
+- name: Create data volume
+  docker_volume:
+    volume_name: postgresql_data
+  when: postgresql_persist_data
+
+- name: Start PostgreSQL
+  docker_container:
+    container_default_behavior: no_defaults
+    name: postgres
+    image: postgres:13.6
+    env:
+      POSTGRES_USER: "{{ postgresql_user }}"
+      POSTGRES_PASSWORD: "{{ postgresql_password|default(omit) }}"
+      POSTGRES_HOST_AUTH_METHOD: "{{ postgresql_password|default(None)|ternary(omit, 'trust') }}"
+    published_ports:
+      - "{{ postgresql_listen_addresses }}:5432:5432"
+    command_handling: correct
+    command:
+      # https://www.postgresql.org/docs/current/non-durability.html
+      - -c
+      - fsync=off
+      - -c
+      - synchronous_commit=off
+      - -c
+      - full_page_writes=off
+      - -c
+      - max_wal_size=1GB
+      - -c
+      - checkpoint_timeout=1d
+    tmpfs: "{{ postgresql_persist_data | ternary(omit, '/var/lib/postgresql/data') }}"
+    volumes: "{{ postgresql_persist_data | ternary('postgresql_data:/var/lib/postgresql/data:rw', omit) }}"
+    pull: true
+    restart_policy: always

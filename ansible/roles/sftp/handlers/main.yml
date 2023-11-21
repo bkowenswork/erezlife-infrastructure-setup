@@ -1,0 +1,10 @@
+---
+- name: Reload sshd
+  systemd:
+    name: sshd
+    state: reloaded
+
+- name: Remount S3FS
+  mount:
+    path: /home/clients
+    state: remounted

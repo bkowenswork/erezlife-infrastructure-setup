@@ -1,0 +1,50 @@
+---
+- hosts: all
+  tasks:
+    - name: Get latest ca-certificates
+      yum:
+        name: ca-certificates
+        state: latest
+
+- hosts: "{{ web_target }}"
+  tasks:
+    - name: Add proxy to web hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: " test\\.erezlife\\.com$"
+        line: "{{ hostvars['test.erezlife.com'].ansible_host }} test.erezlife.com"
+
+- hosts:
+    - test_cache
+    - test_config
+  roles:
+    - common
+    - redis
+
+- hosts: "test_db"
+  roles:
+    - name: postgresql
+      vars:
+        postgresql_listen_addresses: "0.0.0.0"
+        postgresql_server: true
+        postgresql_user: erezadmin
+        postgresql_password: "{{ erezadmin_database_password }}"
+        postgresql_persist_data: true
+
+- import_playbook: site.yml
+
+- hosts:
+    - "{{ proxy_target }}"
+    - "{{ web_target }}"
+  tasks:
+    - name: Allow current user to SSH as erezadmin
+      block:
+        - name: Lookup an id_ed25519 key
+          authorized_key:
+            user: erezadmin
+            key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
+      rescue:
+        - name: Lookup an RSA key
+          authorized_key:
+            user: erezadmin
+            key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"

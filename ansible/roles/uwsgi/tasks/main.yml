@@ -1,0 +1,74 @@
+---
+- name: Install uWSGI
+  yum:
+    name:
+      - uwsgi
+  notify: Restart uWSGI
+
+- name: Install uWSGI libraries
+  yum:
+    name:
+      - uwsgi-devel
+      - libcap-devel
+      - libuuid-devel
+      - openssl-devel
+      # Used for routing support
+      - pcre-devel
+
+- name: Read uwsgi-devel version
+  command: rpm --queryformat='%{VERSION}' --query uwsgi-devel
+  changed_when: False
+  register: uwsgi_version_cmd
+
+- name: Define uWSGI facts to compile Python plugin (1/2)
+  set_fact:
+    uwsgi_python_version: 3.8
+    uwsgi_version: "{{ uwsgi_version_cmd.stdout }}"
+
+- name: Define uWSGI facts to compile Python plugin (2/2)
+  set_fact:
+    uwsgi_plugin_python_path: "/usr/src/uwsgi/{{ uwsgi_version }}/python{{ uwsgi_python_version }}_plugin_uwsgi{{ uwsgi_version }}.so"
+
+- name: Compile uWSGI Python plugin
+  command: "
+    scl enable rh-python38 --
+    sh -c 'PYTHON=python{{ uwsgi_python_version }} uwsgi --build-plugin plugins/python core'
+    "
+  args:
+    chdir: "/usr/src/uwsgi/{{ uwsgi_version }}/"
+    # File is created by the next task. Skip task when the target exists.
+    creates: "{{ uwsgi_plugin_python_path }}"
+
+- name: Rename uWSGI Python plugin
+  copy:
+    remote_src: yes
+    src: "/usr/src/uwsgi/{{ uwsgi_version }}/python_plugin.so"
+    dest: "{{ uwsgi_plugin_python_path }}"
+
+- name: Create uWSGI lib directory
+  file:
+    path: /usr/lib64/uwsgi
+    state: directory
+    mode: 0755
+
+- name: Make uWSGI python plugin available
+  file:
+    path: /usr/lib64/uwsgi/python_plugin.so
+    src: "{{ uwsgi_plugin_python_path }}"
+    state: link
+
+- name: Create uWSGI runtime variable data directory
+  command: systemd-tmpfiles --create
+
+- name: Write uwsgi.ini
+  template:
+    src: uwsgi.ini.j2
+    dest: /etc/uwsgi.ini
+    mode: 0600
+  notify: Restart uWSGI
+
+- name: Enable uWSGI
+  systemd:
+    name: uwsgi
+    enabled: yes
+    state: started

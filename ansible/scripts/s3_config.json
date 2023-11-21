@@ -1,0 +1,56 @@
+{
+    "s3": {
+        "files": {
+            "all_passwords": "passwords.yml",
+            "aws_passwords": "aws/passwords.yml",
+            "aws_sftp_passwords": "aws/sftp_passwords.yml",
+            "saml_passwords": "saml/passwords.yml",
+            "sentry_passwords": "sentry/passwords.yml",
+            "uservoice_passwords": "uservoice/passwords.yml",
+
+            "ca_host_passwords": "ca.erezlife.com/host_passwords.yml",
+            "ca_ssh_key": "ca.erezlife.com/aws.pem",
+            "ca_ssh_public_key": "ca.erezlife.com/aws.pem.pub",
+            "us_host_passwords": "us.erezlife.com/host_passwords.yml",
+            "us_ssh_key": "us.erezlife.com/aws.pem",
+            "us_ssh_public_key": "us.erezlife.com/aws.pem.pub",
+
+            "jenkins_group_passwords": "jenkins/group_passwords.yml",
+            "jenkins_ssh_key": "jenkins/aws.pem",
+            "jenkins_ssh_public_key": "jenkins/aws.pem.pub",
+            "jenkins_user_ssh_key": "jenkins/ssh_id_rsa",
+            "jenkins_user_ssh_public_key": "jenkins/ssh_id_rsa.pub"
+        },
+        "directories": {
+            "saml_certs": "saml/cert",
+            "ssl_path": "ssl"
+        }
+    },
+    "ansible": {
+        "files": {
+            "all_passwords": "group_vars/all/passwords.yml",
+            "aws_passwords": "roles/aws/vars/aws_passwords.yml",
+            "aws_sftp_passwords": "roles/sftp/vars/aws_passwords.yml",
+            "saml_passwords": "roles/web/files/saml_passwords.yml",
+            "sentry_passwords": "roles/web/files/sentry.yml",
+            "uservoice_passwords": "roles/web/files/uservoice.yml",
+
+            "ca_host_passwords": "host_vars/erezlife-ca-web/passwords.yml",
+            "ca_ssh_key": "ssh/aws_ca.pem",
+            "ca_ssh_public_key": "ssh/aws_ca.pem.pub",
+            "us_host_passwords": "host_vars/erezlife-us-web/passwords.yml",
+            "us_ssh_key": "ssh/aws_us.pem",
+            "us_ssh_public_key": "ssh/aws_us.pem.pub",
+
+            "jenkins_group_passwords": "group_vars/jenkins/passwords.yml",
+            "jenkins_ssh_key": "ssh/aws_jenkins.pem",
+            "jenkins_ssh_public_key": "ssh/aws_jenkins.pem.pub",
+            "jenkins_user_ssh_key": "roles/jenkins/files/ssh/id_rsa",
+            "jenkins_user_ssh_public_key": "roles/jenkins/files/ssh/id_rsa.pub"
+        },
+        "directories": {
+            "saml_certs": "roles/web/files/saml/cert",
+            "ssl_path": "roles/nginx/files"
+        }
+    }
+}

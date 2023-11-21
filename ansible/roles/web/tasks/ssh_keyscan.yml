@@ -1,0 +1,11 @@
+---
+- name: Gather public host keys
+  command:
+    "ssh-keyscan {{ host }}"
+  register: host_keys
+
+- name: Add public host keys to known_hosts
+  become_user: erezadmin
+  known_hosts:
+    name: "{{ host }}"
+    key: "{{ host_keys.stdout }}"

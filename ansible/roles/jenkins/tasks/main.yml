@@ -1,0 +1,239 @@
+---
+- import_tasks: nodejs.yml
+- import_tasks: ipsec.yml
+
+- name: Copy sudoers.d files
+  copy:
+    src: sudoers.d/
+    dest: /etc/sudoers.d/
+    mode: 0440
+
+- name: Install additional packages
+  yum:
+    name:
+      - awscli           # Used by download-all-db job
+      - graphviz         # Draw graphs in the documentation
+      - hub              # Used by update-packages job
+      - java
+      - openldap-clients # Required by python tests for LDAP
+      - openldap-servers # Required by python tests for LDAP
+      - openldap-devel   # Required by python-ldap Python package
+      - openssl-devel    # Required by cryptography Python package
+      - poppler-utils    # Required by PHP test suite
+
+- name: Set SELinux to permissive on slapd_t
+  selinux_permissive:
+    domain: slapd_t
+    permissive: yes
+
+# For EC2 key rotation. Allow it to create the key material.
+- name: Set SELinux to permissive on ssh-keygen
+  selinux_permissive:
+    domain: ssh_keygen_t
+    permissive: yes
+
+- name: Download Jenkins repository
+  get_url:
+    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+
+- name: Add Jenkins repository key
+  rpm_key:
+    key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+- name: Install Jenkins
+  yum:
+    name: jenkins
+
+# TODO: Drop “Remove Jenkins user .pgpass” after a successful provision.
+- name: Remove Jenkins user .pgpass
+  file:
+    path: ~jenkins/.pgpass
+    state: absent
+
+- import_tasks: docker.yml
+
+- import_role:
+    name: postgresql
+  vars:
+    postgresql_listen_addresses: "[::1]"
+    postgresql_server: true
+    postgresql_user: jenkins
+
+- name: Create script directory
+  file:
+    path: "{{ jenkins_base_path }}/init.groovy.d"
+    state: directory
+
+- name: Enable Jenkins service
+  systemd:
+    name: jenkins
+    enabled: yes
+
+- import_tasks: jenkins_github.yml
+
+- import_role:
+    name: aws
+  vars:
+    aws_user: jenkins
+    aws_access_key_id: "{{ aws_root_access_key_id }}"
+    aws_secret_access_key: "{{ aws_root_secret_access_key }}"
+
+- import_tasks: ssh.yml
+
+- name: Copy the Jenkins init file
+  copy:
+    src: jenkins
+    dest: /etc/sysconfig/jenkins
+    mode: 0600
+
+- name: Copy config files and credentials
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ jenkins_base_path }}/{{ item }}"
+  loop:
+    - config.xml
+    - credentials.xml
+    - github-plugin-configuration.xml
+
+- name: Configure Jenkins
+  template:
+    src: templates/jenkins.model.JenkinsLocationConfiguration.xml.j2
+    dest: "{{ jenkins_base_path }}/jenkins.model.JenkinsLocationConfiguration.xml"
+
+- name: Copy create accounts script
+  template:
+    src: groovy/users.groovy.j2
+    dest: "{{ jenkins_base_path }}/init.groovy.d/users.groovy"
+    owner: jenkins
+    group: jenkins
+    mode: 0600
+  register: users
+
+- name: Start Jenkins
+  systemd:
+    name: jenkins
+    state: restarted
+  when: users.changed
+
+- import_tasks: wait.yml
+
+# Jenkins CLI
+# https://wiki.jenkins-ci.org/display/JENKINS/Jenkins+CLI
+- name: Get jenkins-cli from the Jenkins server.
+  get_url:
+    url: "http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/jnlpJars/jenkins-cli.jar"
+    dest: "{{ jenkins_jar }}"
+    force: yes
+
+- name: Install Jenkins plugins
+  command:
+    java -jar "{{ jenkins_jar }}"
+    -auth @{{ jenkins_base_path }}/jenkins-cli-auth
+    -s "http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/"
+    install-plugin "{{ item }}" -deploy
+  loop:
+    - basic-branch-build-strategies
+    - build-token-root
+    - copyartifact
+    - email-ext
+    - git
+    - github-branch-source
+    - github-scm-trait-notification-context
+    - greenballs
+    - mailer
+    - PrioritySorter
+    - throttle-concurrents
+    - workflow-aggregator
+    - ws-cleanup
+
+- name: Copy configuration files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ jenkins_base_path }}/"
+  loop:
+    - hudson.plugins.throttleconcurrents.ThrottleJobProperty.xml
+    - jenkins.advancedqueue.PriorityConfiguration.xml
+    - jenkins.advancedqueue.PrioritySorterConfiguration.xml
+    - jenkins.CLI.xml
+
+- name: Turn on agent to master security subsystem
+  copy:
+    dest: "{{ jenkins_base_path }}/secrets/slave-to-master-security-kill-switch"
+    content: "false"
+    owner: jenkins
+    group: jenkins
+    mode: 0600
+
+- name: Copy mailer init script
+  template:
+    src: groovy/mailer.groovy.j2
+    dest: "{{ jenkins_base_path }}/init.groovy.d/mailer.groovy"
+    owner: jenkins
+    group: jenkins
+    mode: 0600
+
+- name: Ensure jobs directories exist
+  file:
+    path: "{{ jenkins_base_path }}/jobs/{{ item|basename|regex_replace('\\.xml\\.j2$') }}"
+    state: directory
+    owner: jenkins
+    group: jenkins
+  with_fileglob:
+    - ../templates/jobs/*
+
+- name: Create jobs configs
+  template:
+    src: "{{ item }}"
+    dest: "{{ jenkins_base_path }}/jobs/{{ item|basename|regex_replace('\\.xml\\.j2$') }}/config.xml"
+    owner: jenkins
+    group: jenkins
+  with_fileglob:
+    - ../templates/jobs/*
+
+- name: Ensure update-packages job directories exist
+  file:
+    path: "{{ jenkins_base_path }}/jobs/update-packages-{{ item['repo'] }}"
+    state: directory
+    owner: jenkins
+    group: jenkins
+  loop: "{{ update_packages_repos }}"
+
+- name: Create update-packages job configs
+  template:
+    src: common/update-packages.xml.j2
+    dest: "{{ jenkins_base_path }}/jobs/update-packages-{{ item['repo'] }}/config.xml"
+    owner: jenkins
+    group: jenkins
+  loop: "{{ update_packages_repos }}"
+
+# Must reload configuration for changes to take effect
+- name: Restart Jenkins
+  command:
+    java -jar "{{ jenkins_jar }}"
+    -auth @{{ jenkins_base_path }}/jenkins-cli-auth
+    -s "http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/"
+    safe-restart
+  when: not skip_restart
+
+- import_tasks: wait.yml
+
+- name: Remove mailer configuration file
+  file:
+    path: "{{ jenkins_base_path }}/init.groovy.d/mailer.groovy"
+    state: absent
+
+- name: Trigger download-all-db job
+  command:
+    java -jar "{{ jenkins_jar }}"
+    -auth @{{ jenkins_base_path }}/jenkins-cli-auth
+    -s "http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/"
+    build download-all-db
+
+- name: Jenkins NGINX configuration
+  template:
+    src: templates/jenkins.conf.j2
+    dest: /etc/nginx/conf.d/jenkins.conf
+  notify: Reload NGINX
+
+- import_tasks: documentation.yml

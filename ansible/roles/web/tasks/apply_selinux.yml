@@ -1,0 +1,14 @@
+---
+- import_tasks: ../../common/tasks/apply_selinux.yml
+
+- name: Set PHP cachetool SELinux security context
+  sefcontext:
+    target: "/var/run/erezlife/cachetool(/.*)?"
+    setype: httpd_sys_content_t
+
+- name: Restore SELinux security contexts
+  command: "restorecon -R {{ item }}"
+  loop:
+    - /usr/share/php/simplesamlphp/metadata
+    - /var/run/erezlife/cachetool
+    - /var/spool/cron

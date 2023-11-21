@@ -1,0 +1,5 @@
+---
+- name: Restart Amazon CloudWatch agent
+  systemd:
+    name: amazon-cloudwatch-agent
+    state: restarted

@@ -1,0 +1,1 @@
+%erezadmin ALL=NOPASSWD: /bin/scl enable rh-python38 -- clientaccount *

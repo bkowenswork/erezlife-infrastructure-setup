@@ -1,0 +1,12 @@
+---
+- name: Install SimpleSAMLphp NGINX upstream conf
+  template:
+    src: simplesaml_upstream.conf.j2
+    dest: /etc/nginx/conf.d/upstream/simplesaml.conf
+  notify: Reload NGINX
+
+- name: Install SimpleSAMLphp NGINX location conf
+  template:
+    src: simplesaml_location.conf.j2
+    dest: /etc/nginx/conf.d/location/simplesaml.conf
+  notify: Reload NGINX

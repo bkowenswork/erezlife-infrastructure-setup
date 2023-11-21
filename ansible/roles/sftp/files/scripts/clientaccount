@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import pwd
+import subprocess
+
+CLIENT_HOME = "/home/clients"
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--delete", action="store_true")
+    parser.add_argument("username")
+    return parser.parse_args()
+
+
+def drop_user(username):
+    args = ["userdel", "--force", "--remove", username]
+    subprocess.check_call(args)
+
+
+def add_user(username):
+    # Pass -M to avoid creating the user's home directory. It will be created
+    # on S3 by erezadmin.
+    args = [
+        "useradd",
+        "--base-dir",
+        CLIENT_HOME,
+        "--groups",
+        "clients",
+        "-M",
+        "--shell",
+        "/sbin/nologin",
+        username,
+    ]
+    subprocess.check_call(args)
+
+
+def chown_home_dir(username):
+    home = os.path.expanduser(f"~{username}")
+    directories = [
+        os.path.join(home, "studentlists"),
+        os.path.join(home, "studentpics"),
+    ]
+    for path in directories:
+        os.chmod(path, mode=0o770)
+
+
+def main():
+    args = parse_args()
+
+    # If user doesn't exist, skip.
+    if args.delete:
+        if args.username in (pw.pw_name for pw in pwd.getpwall()):
+            drop_user(args.username)
+    else:
+        add_user(args.username)
+        chown_home_dir(args.username)
+
+
+if __name__ == "__main__":
+    main()

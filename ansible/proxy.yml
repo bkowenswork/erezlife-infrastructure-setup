@@ -1,0 +1,7 @@
+---
+- hosts: "{{ proxy_target }}"
+  roles:
+    - role: erezadmin
+      erezadmin_allow_ssh_from_web: yes
+    - simplesamlphp
+    - proxy

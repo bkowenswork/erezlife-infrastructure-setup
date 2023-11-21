@@ -1,0 +1,11 @@
+---
+- hosts: "{{ region_target }}"
+  roles:
+    - common
+    - ssh_access
+    - cloudwatch
+    - ssm
+
+- import_playbook: erezlife.yml
+- import_playbook: proxy.yml
+- import_playbook: sftp.yml

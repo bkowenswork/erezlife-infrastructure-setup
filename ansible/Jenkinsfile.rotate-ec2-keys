@@ -1,0 +1,103 @@
+#!groovy
+
+void scl(String cmd) {
+    sh "scl enable rh-python38 -- ${cmd}"
+}
+
+pipeline {
+  agent any
+
+  stages {
+    stage('Build') {
+      steps {
+        scl 'make'
+        sh 'make credentials'
+      }
+    }
+
+    stage('Enable IPSec tunnel') {
+      steps {
+        sh 'sudo systemctl start ipsec'
+      }
+    }
+
+    stage('Prepare CA') {
+      steps {
+        sh 'venv/bin/ansible-playbook prepare-key-rotation.yml --extra-vars target_group=ca'
+      }
+    }
+
+    stage('Prepare US') {
+      steps {
+        sh 'venv/bin/ansible-playbook prepare-key-rotation.yml --extra-vars target_group=us'
+      }
+    }
+
+    stage('Prepare Jenkins') {
+      steps {
+        sh 'venv/bin/ansible-playbook prepare-key-rotation.yml --extra-vars target_group=jenkins'
+      }
+    }
+
+    stage('Update local credentials') {
+      steps {
+        sh 'make credentials'
+      }
+    }
+
+    stage('Provision CA') {
+      steps {
+        sh 'venv/bin/ansible-playbook site.yml --extra-vars "region_target=ca web_target=ca_web proxy_target=ca_proxy sftp_target=ca_sftp bastion_target=ca_bastion"'
+      }
+    }
+
+    stage('Provision US') {
+      steps {
+        sh 'venv/bin/ansible-playbook site.yml --extra-vars "region_target=us web_target=us_web proxy_target=us_proxy sftp_target=us_sftp bastion_target=us_bastion"'
+      }
+    }
+
+    stage('Provision Jenkins') {
+      steps {
+        sh 'venv/bin/ansible-playbook jenkins.yml --extra-vars "skip_restart=True"'
+      }
+    }
+
+    stage('Enable IPSec tunnel after Jenkins provisioning disabled it') {
+      steps {
+        sh 'sudo systemctl start ipsec'
+      }
+    }
+
+    stage('Finalize CA') {
+      steps {
+        sh 'venv/bin/ansible-playbook finalize-key-rotation.yml --extra-vars target_group=ca'
+      }
+    }
+
+    stage('Finalize US') {
+      steps {
+        sh 'venv/bin/ansible-playbook finalize-key-rotation.yml --extra-vars target_group=us'
+      }
+    }
+
+    stage('Finalize Jenkins') {
+      steps {
+        sh 'venv/bin/ansible-playbook finalize-key-rotation.yml --extra-vars target_group=jenkins'
+      }
+    }
+
+  }
+
+  post {
+    always {
+      catchError {
+        sh 'sudo systemctl stop ipsec'
+      }
+    }
+
+    failure {
+      step([$class: 'Mailer', recipients: 'bugs@erezlife.com', sendToIndividuals: true])
+    }
+  }
+}

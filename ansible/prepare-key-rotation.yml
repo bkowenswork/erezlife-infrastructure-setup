@@ -1,0 +1,56 @@
+---
+- hosts: "{{ target_group }}"
+
+  vars:
+
+    base_key_name: aws.pem
+    public_key_name: "{{ base_key_name }}.pub"
+
+  tasks:
+
+    - name: Create new SSH key material
+      run_once: True
+      become: False
+      local_action: 
+        module: openssh_keypair
+        path: "{{ base_key_name }}"
+        type: rsa
+        size: 4096
+        force: True
+
+    - name: Add new SSH key material
+      authorized_key:
+        user: "{{ ansible_user }}"
+        key: "{{ lookup('file', '{{ public_key_name }}') }}"
+
+    - name: Create SSH connection command
+      set_fact:
+        ssh_connection: "ssh -i {{ base_key_name }} {{ ansible_user }}@{{ ansible_host }} -p 22 whoami"
+
+    - name: Check SSH connectivity using newly added key
+      become: False
+      local_action:
+        module: command
+        cmd: "{{ ssh_connection }}"
+      register: whoami_output
+      changed_when: False
+
+    - name: Assert new SSH key allows login
+      become: False
+      local_action:
+        module: assert 
+        that: 
+          - whoami_output.stdout == ansible_user
+
+    - name: Update SSH keys in S3
+      run_once: True
+      become: False
+      local_action:
+        module: amazon.aws.aws_s3
+        bucket: erezlife-credentials
+        object: "{{ credential_path }}/{{ item }}"
+        src: "{{ item }}"
+        mode: put
+      loop:
+        - "{{ base_key_name }}"
+        - "{{ public_key_name }}"

@@ -1,0 +1,7 @@
+ansible
+awscli
+clear-lambda-storage
+flake8
+flake8-comprehensions
+isort
+PyYAML

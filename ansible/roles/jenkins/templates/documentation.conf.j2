@@ -1,0 +1,11 @@
+server {
+    server_name docs.erezlife.com;
+
+    include /etc/nginx/conf.d/include/ssl.conf;
+
+    location / {
+        root {{ jenkins_documentation_root }};
+        auth_basic "Private site";
+        auth_basic_user_file {{ jenkins_documentation_htaccess }};
+    }
+}

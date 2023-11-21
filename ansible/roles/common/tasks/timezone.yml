@@ -1,0 +1,12 @@
+---
+- name: Set time zone
+  timezone:
+    name: "{{ time_zone }}"
+  when: time_zone is defined
+
+- name: Install ntpdate
+  yum:
+    name: ntpdate
+
+- name: Synchronize clock
+  command: ntpdate 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org

@@ -1,0 +1,5 @@
+---
+# Update the security context for the paths defined in system selinux rules
+
+- command:
+    restorecon -R /var/log

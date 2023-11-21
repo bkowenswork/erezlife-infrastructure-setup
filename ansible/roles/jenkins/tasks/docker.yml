@@ -1,0 +1,6 @@
+- name: Add Jenkins user to Docker group
+  user:
+    name: jenkins
+    groups: docker
+    append: yes
+  become: yes

@@ -1,0 +1,89 @@
+---
+aws: False
+debug: False
+email: bugs@erezlife.com
+saml_owner: erezadmin
+client_max_body_size: 32M
+php_fpm_listen_port: 9000
+php_max_execution_time: "1800"
+erezlife_users:
+  - last_name: Arentsen
+    first_name: Jordan
+    email: jordan.arentsen@erezlife.com
+    github_username: blissdev
+    site_superuser: yes
+
+  - last_name: Battersby
+    first_name: Kirsty
+    email: kirsty.battersby@erezlife.com
+    github_username: kbattersby
+    site_superuser: yes
+
+  - last_name: Bender
+    first_name: Andrew
+    email: andrew.bender@erezlife.com
+    github_username: adamanthil
+    site_superuser: yes
+
+  - last_name: Bender
+    first_name: John
+    email: john.bender@erezlife.com
+    site_superuser: yes
+
+  - last_name: Conde
+    first_name: Tiffany
+    email: tiffany.conde@erezlife.com
+    site_superuser: yes
+
+  - last_name: Cramer
+    first_name: Laura Jo
+    email: laurajo.cramer@erezlife.com
+    site_superuser: yes
+
+  - last_name: Dell
+    first_name: Kara-Lee
+    email: karalee.dell@erezlife.com
+    site_superuser: yes
+
+  - last_name: Freeman
+    first_name: Dana
+    email: dana.freeman@erezlife.com
+    site_superuser: yes
+
+  - last_name: Kingston
+    first_name: Garrison
+    email: garrison.kingston@erezlife.com
+    site_superuser: yes
+
+  - last_name: Menzies
+    first_name: Jenna
+    email: jenna.menzies@erezlife.com
+    site_superuser: yes
+
+  - last_name: Morrison
+    first_name: Cate
+    email: cate.morrison@erezlife.com
+    site_superuser: yes
+
+  - last_name: Owens
+    first_name: Bryan
+    email: bryan.owens@erezlife.com
+    github_username: bkowenswork
+    site_superuser: yes
+
+  - last_name: Park
+    first_name: Colton
+    email: colton@erezlife.com
+    site_superuser: yes
+
+  - last_name: Rothman
+    first_name: Albert
+    email: albert.rothman@erezlife.com
+    github_username: AlbertRothman
+    site_superuser: yes
+
+  - last_name: Voysey
+    first_name: Chris
+    email: chris.voysey@erezlife.com
+    github_username: cvoysey
+    site_superuser: yes

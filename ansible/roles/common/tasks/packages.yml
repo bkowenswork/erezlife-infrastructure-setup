@@ -1,0 +1,7 @@
+---
+- name: Install common packages
+  yum:
+    name:
+      - mailcap  # Used by Python's mimetypes module
+      - nmon  # Used to check server activity in case of slowness
+      - policycoreutils-python  # Required by Ansible for handling SELinux.

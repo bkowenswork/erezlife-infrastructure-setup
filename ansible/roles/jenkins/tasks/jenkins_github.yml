@@ -1,0 +1,8 @@
+---
+- name: Copy gitconfig to Jenkins
+  template:
+    src: github/gitconfig.j2
+    dest: "{{ jenkins_base_path }}/.gitconfig"
+    owner: jenkins
+    group: jenkins
+    mode: 0664

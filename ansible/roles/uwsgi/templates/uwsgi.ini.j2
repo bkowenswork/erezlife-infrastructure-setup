@@ -1,0 +1,9 @@
+[uwsgi]
+strict = true
+uid = uwsgi
+gid = uwsgi
+emperor = /etc/uwsgi.d
+emperor-tyrant = true
+emperor-on-demand-extension = .socket
+emperor-broodlord = {{ ansible_processor_vcpus }}
+cap = setuid,setgid

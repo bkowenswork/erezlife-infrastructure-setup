@@ -1,0 +1,5 @@
+upstream simplesaml_hosts {
+    {% for host in groups[web_target] %}
+        server {{ hostvars[host].ansible_host }}:{{ php_fpm_listen_port }};
+    {% endfor %}
+}

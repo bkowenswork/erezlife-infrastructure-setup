@@ -1,0 +1,17 @@
+---
+- name: Install git
+  yum:
+    name: git
+
+- name: Create SimpleSAMLphp directory
+  file:
+    path: "{{ saml_path }}"
+    state: directory
+    owner: "{{ saml_owner }}"
+
+- name: Clone SimpleSAMLphp
+  become_user: "{{ saml_owner }}"
+  git:
+    repo: "https://github.com/simplesamlphp/simplesamlphp.git"
+    dest: "{{ saml_path }}"
+    version: v1.19.6

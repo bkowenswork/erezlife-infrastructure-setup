@@ -1,0 +1,86 @@
+---
+- include_vars: roles/web/files/uservoice.yml
+- include_vars: roles/web/files/sentry.yml
+
+- name: Make SSH connections non-interactive
+  copy:
+    src: erezadmin_ssh_config
+    dest: ~erezadmin/.ssh/config
+    mode: 0600
+    owner: erezadmin
+    group: erezadmin
+
+- name: Install AWS CLI configuration
+  become_user: erezadmin
+  template:
+    src: aws_config.j2
+    dest: ~/.aws/config
+    mode: 0600
+
+- name: Create Composer directory
+  become_user: erezadmin
+  file:
+    path: ~/.composer
+    state: directory
+
+- name: Install cachetool
+  become_user: erezadmin
+  composer:
+    command: require
+    arguments: gordalina/cachetool --update-with-all-dependencies
+    global_command: yes
+
+- name: Set cron SELinux context
+  sefcontext:
+    target: /var/spool/cron/erezadmin
+    setype: user_cron_spool_t
+
+- name: Create directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: erezadmin
+    group: erezadmin
+  loop:
+    - /opt/erezadmin
+    - /opt/erezadmin/src
+    - /opt/erezadmin/venv
+
+- name: Create directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: erezadmin
+    group: erezadmin
+    mode: 0700
+  loop:
+    - /opt/erezadmin/tmp
+    - /var/log/erezadmin
+
+- name: Update erezadmin.json
+  template:
+    src: erezadmin.json.j2
+    dest: /etc/erezadmin.json
+    owner: erezadmin
+    group: erezadmin
+    mode: 0640
+  notify: Restart erezadmin
+
+- name: Configure allowed users
+  copy:
+    dest: /etc/erezadmin-users.json
+    content: "{{ erezlife_users | to_nice_json(ensure_ascii=False) }}"
+    mode: 0640
+    owner: erezadmin
+    group: erezlife
+
+- name: Copy systemd unit files
+  copy:
+    src: erezadmin-celery.service
+    dest: /etc/systemd/system/
+  notify: Reload systemd
+
+- name: Enable erezadmin-celery
+  systemd:
+    name: erezadmin-celery
+    enabled: yes

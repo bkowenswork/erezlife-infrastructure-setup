@@ -1,0 +1,17 @@
+---
+- name: Create erezadmin vhost in rabbitmq
+  rabbitmq_vhost:
+    name: erezadmin
+    node: rabbit@localhost
+
+# Use force to update user's password.
+- name: Set erezadmin permissions in rabbitmq
+  rabbitmq_user:
+    user: erezadmin
+    vhost: erezadmin
+    node: rabbit@localhost
+    password: "{{ erezadmin_broker_password }}"
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    force: yes

@@ -1,0 +1,61 @@
+---
+- import_tasks: certs.yml
+  when: nginx_https
+
+- name: Install NGINX
+  yum:
+    name: nginx
+
+- name: Allow proxy_pass to make network requests
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+
+- name: Remove default NGINX assets
+  file:
+    name: "/usr/share/nginx/html/{{ item }}"
+    state: absent
+  loop:
+    - index.html
+    - nginx-logo.png
+    - poweredby.png
+
+- name: Install custom service file
+  copy:
+    src: nofile_limit.conf
+    dest: /etc/systemd/system/nginx.service.d/nofile_limit.conf
+  notify:
+    - Reload systemd
+    - Reload NGINX
+
+- name: Set default configuration
+  copy:
+    src: nginx.conf
+    dest: /etc/nginx/nginx.conf
+  notify: Reload NGINX
+
+- name: Redirect HTTP to HTTPS
+  copy:
+    src: redirect_to_https.conf
+    dest: /etc/nginx/conf.d/redirect_to_https.conf
+  when: nginx_https
+  notify: Reload NGINX
+
+- name: Create NGINX include config path
+  file:
+    path: /etc/nginx/conf.d/include
+    state: directory
+
+- name: Create NGINX shared SSL configuration
+  template:
+    src: ssl.conf.j2
+    dest: /etc/nginx/conf.d/include/ssl.conf
+  when: nginx_https
+  notify: Reload NGINX
+
+- name: Start and enable NGINX
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes

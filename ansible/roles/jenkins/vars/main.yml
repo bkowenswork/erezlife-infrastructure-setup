@@ -1,0 +1,19 @@
+---
+jenkins_base_path: /var/lib/jenkins
+jenkins_hostname: localhost
+jenkins_http_port: 8080
+jenkins_jar: "{{ jenkins_base_path }}/jenkins-cli.jar"
+jenkins_ssh_path: "{{ jenkins_base_path }}/.ssh"
+
+jenkins_documentation_root: /usr/share/nginx/html/erezlife-docs
+jenkins_documentation_htaccess: "{{ jenkins_documentation_root }}/.htaccess"
+
+update_packages_repos:
+  - repo: ansible-server-setup
+    default_branch: master
+  - repo: erezadmin
+    default_branch: master
+  - repo: erezlife
+    default_branch: beta
+  - repo: lambdas
+    default_branch: master

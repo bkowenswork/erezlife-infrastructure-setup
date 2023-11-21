@@ -1,0 +1,6 @@
+---
+- name: Copy sudoers.d files
+  copy:
+    src: sudoers.d/
+    dest: /etc/sudoers.d/
+    mode: 0440

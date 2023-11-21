@@ -1,0 +1,83 @@
+---
+- include_vars: roles/web/files/saml_passwords.yml
+
+- name: Set SimpleSAMLphp log SELinux context
+  sefcontext:
+    target: '/var/log/simplesaml(/.*)?'
+    setype: httpd_sys_rw_content_t
+
+- name: Create SimpleSAMLphp log path
+  file:
+    path: /var/log/simplesaml
+    state: directory
+    owner: erezlife
+    group: erezlife
+
+- name: Install SimpleSAMLphp dependencies
+  become_user: "{{ saml_owner }}"
+  composer:
+    command: install
+    working_dir: "{{ saml_path }}"
+
+- name: Install SimpleSAMLphp config.php
+  template:
+    src: config.php.j2
+    dest: "{{ saml_path }}/config/config.php"
+    owner: "{{ saml_owner }}"
+  notify: Reload PHP-FPM
+
+- name: Install SimpleSAMLphp authsources.php
+  template:
+    src: authsources.php.j2
+    dest: "{{ saml_path }}/config/authsources.php"
+    owner: "{{ saml_owner }}"
+  notify: Reload PHP-FPM
+
+- name: Install module_cron.php
+  template:
+    src: module_cron.php.j2
+    dest: "{{ saml_path }}/config/module_cron.php"
+    owner: "{{ saml_owner }}"
+  notify: Reload PHP-FPM
+
+- name: Enable cron for SimpleSAMLphp
+  file:
+    path: "{{ saml_path }}/modules/cron/enable"
+    state: touch
+
+- name: Ensure config-metarefresh.php exists
+  copy:
+    src: config-metarefresh.php
+    dest: "{{ saml_path }}/config/config-metarefresh.php"
+    force: no
+
+- name: Ensure trusted-domains allowed list exists
+  file:
+    path: "{{ saml_path }}/config/trusted-domains.txt"
+    state: touch
+
+- name: Set SimpleSAMLphp metarefresh SELinux context
+  sefcontext:
+    target: "{{ item }}"
+    setype: httpd_sys_rw_content_t
+  loop:
+    - "{{ saml_path }}/metadata(/.*)?"
+    - "{{ saml_path }}/config/config-metarefresh.php"
+    - "{{ saml_path }}/config/config-metarefresh.php~"
+
+- name: Allow SimpleSAMLphp metarefresher to write metadata cache
+  file:
+    path: "{{ saml_path }}/metadata"
+    state: directory
+    owner: erezlife
+    group: erezlife
+
+- name: Enable metarefresh for SimpleSAMLphp
+  file:
+    path: "{{ saml_path }}/modules/metarefresh/enable"
+    state: touch
+
+- name: Sync SAML cert files
+  copy:
+    src: saml/cert/
+    dest: "{{ saml_path }}/cert/"

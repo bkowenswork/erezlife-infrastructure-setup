@@ -1,0 +1,11 @@
+---
+- name: Add erezlife user
+  user:
+    name: erezlife
+    shell: /sbin/nologin
+
+- name: Add erezadmin to erezlife group
+  user:
+    name: erezadmin
+    append: yes
+    groups: erezlife

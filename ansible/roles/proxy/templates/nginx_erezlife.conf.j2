@@ -1,0 +1,68 @@
+types_hash_max_size 2048;
+server_names_hash_max_size 4096;
+
+large_client_header_buffers 4 16k;
+
+client_max_body_size {{ client_max_body_size }};
+fastcgi_read_timeout {{ php_max_execution_time }};
+
+{% for aws_elb_subnet in aws_elb_subnets %}
+set_real_ip_from {{ aws_elb_subnet }};
+{% endfor %}
+{% if aws_elb_subnets %}
+real_ip_header X-Forwarded-For;
+
+{% endif %}
+error_page 404 /404.html;
+error_page 413 /413.html;
+error_page 503 /503.html;
+
+# Load upstream config files for all sites.
+include /etc/nginx/conf.d/upstream/*.conf;
+
+# Set header if not defined, source: https://serverfault.com/a/598106
+map $upstream_http_cache_control $cache_control {
+'' 'max-age: 0, no-cache, no-store, must-revalidate, private';
+}
+map $upstream_http_expires $expires {
+'' 'Wed, 25 Dec 2001 12:33:21 GMT';
+}
+
+server {
+    {# Used by AWS Load Balancers to check proxy health. #}
+    server_name {{ ansible_default_ipv4.address }};
+    include /etc/nginx/conf.d/include/http_listen.conf;
+
+    location /status {
+        stub_status;
+        allow 127.0.0.0/8;
+        {% for aws_elb_subnet in aws_elb_subnets %}
+        allow {{ aws_elb_subnet }};
+        {% endfor %}
+        deny all;
+    }
+}
+
+server {
+    server_name {{ inventory_hostname }};
+    {% if nginx_https %}
+    include /etc/nginx/conf.d/include/ssl.conf;
+    {% else %}
+    include /etc/nginx/conf.d/include/http_listen.conf;
+    {% endif %}
+
+    add_header 'Cache-Control' $cache_control;
+    add_header 'Expires' $expires;
+    add_header Permissions-Policy interest-cohort=();
+
+    # Avoid default behavior of returning a 403 for a failed directory
+    # listing.
+    try_files $uri =404;
+
+    # Load uWSGI and fastcgi config files for all sites without a
+    # subdomain.
+    include /etc/nginx/conf.d/location/*.conf;
+}
+
+# Load server config files for subdomain sites.
+include /etc/nginx/conf.d/server/*.conf;

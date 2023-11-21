@@ -1,0 +1,18 @@
+conn {{ item.name }}
+	authby=secret
+	auto=start
+	left=%defaultroute
+	leftid={{ ansible_default_ipv4.address }}
+	right={{ item.ip }}
+	type=tunnel
+	ikelifetime=8h
+	keylife=1h
+	phase2alg=aes128-sha1;modp1024
+	ike=aes128-sha1;modp1024
+	keyingtries=%forever
+	keyexchange=ike
+	leftsubnet={{ cidr }}
+	rightsubnet={{ item.cidr }}
+	dpddelay=10
+	dpdtimeout=30
+	dpdaction=restart_by_peer

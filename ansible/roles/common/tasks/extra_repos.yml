@@ -1,0 +1,8 @@
+---
+- name: Install yum utils
+  yum:
+    name: yum-utils
+
+- name: Enable extras, optional repos
+  command: yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional
+  when: aws

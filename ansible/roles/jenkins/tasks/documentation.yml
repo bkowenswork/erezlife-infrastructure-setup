@@ -1,0 +1,27 @@
+---
+- name: Install passlib
+  yum:
+    name: python-passlib
+
+- name: Create docs directory
+  file:
+    path: "{{ jenkins_documentation_root }}"
+    state: directory
+    owner: jenkins
+    group: nginx
+    mode: 0750
+
+- name: Create basic auth credentials for the documentation
+  htpasswd:
+    name: erezlife-developers
+    password: "{{ jenkins_documentation_password }}"
+    path: "{{ jenkins_documentation_htaccess }}"
+    owner: jenkins
+    group: nginx
+    mode: 0640
+
+- name: eRezLife documentation NGINX configuration
+  template:
+    src: templates/documentation.conf.j2
+    dest: /etc/nginx/conf.d/documentation.conf
+  notify: Reload NGINX

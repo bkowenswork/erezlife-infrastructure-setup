@@ -1,0 +1,15 @@
+opcache.force_restart_timeout = {{ php_max_execution_time }}
+opcache.validate_timestamps = Off
+
+[PHP]
+auto_detect_line_endings = On
+expose_php = Off
+max_execution_time = {{ php_max_execution_time }}
+max_input_vars = 5000
+memory_limit = 512M
+post_max_size = {{ client_max_body_size }}
+upload_max_filesize = {{ client_max_body_size }}
+
+[Session]
+session.cookie_httponly = On
+session.cookie_secure = On

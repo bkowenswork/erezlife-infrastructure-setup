@@ -1,0 +1,61 @@
+---
+- name: Copy SSH key
+  copy:
+    src: ssh/id_rsa
+    dest: "{{ jenkins_ssh_path }}/"
+    owner: jenkins
+    group: jenkins
+    mode: 0600
+
+- name: Copy SSH public key
+  copy:
+    src: ssh/id_rsa.pub
+    dest: "{{ jenkins_ssh_path }}/"
+    owner: jenkins
+    group: jenkins
+    mode: 0640
+
+- name: Touch known_hosts
+  file:
+    path: "{{ jenkins_ssh_path }}/known_hosts"
+    state: touch
+    owner: jenkins
+    group: jenkins
+
+- name: Gather public host keys
+  command: ssh-keyscan github.com
+  register: github_host_key
+
+- name: Add public host keys to known_hosts
+  known_hosts:
+    path: "{{ jenkins_ssh_path }}/known_hosts"
+    name: github.com
+    key: "{{ github_host_key.stdout }}"
+
+- name: Start IPSec
+  systemd:
+    name: ipsec
+    state: started
+  when: not debug
+
+- block:
+    - name: Gather private host keys
+      command: "ssh-keyscan -T 120 {{ item }}"
+      loop: "{{ groups.all|map('extract', hostvars, ['ansible_host'])|difference([ansible_host]) }}"
+      register: host_keys
+      when: not debug
+
+  always:
+    - name: Stop IPSec
+      systemd:
+        name: ipsec
+        state: stopped
+      when: not debug
+
+- name: Add private host keys to known_hosts
+  known_hosts:
+    path: "{{ jenkins_ssh_path }}/known_hosts"
+    name: "{{ item.item }}"
+    key: "{{ item.stdout }}"
+  loop: "{{ host_keys.results }}"
+  when: not debug

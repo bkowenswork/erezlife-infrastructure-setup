@@ -1,0 +1,33 @@
+[Unit]
+Description=erezadmin Celery Service
+After=network.target
+After=rabbitmq-server.service
+Requires=rabbitmq-server.service
+
+[Service]
+Type=forking
+User=erezadmin
+WorkingDirectory=/opt/erezadmin/src/erezadmin
+PIDFile=/run/erezadmin/celery.pid
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=300
+
+ExecStart=/opt/erezadmin/venv/erezadmin/bin/celery \
+    -A erezadmin \
+    multi \
+    start \
+    worker \
+    --max-tasks-per-child=20 \
+    --logfile=/var/log/erezadmin/celery.log \
+    --pidfile=/run/erezadmin/celery.pid
+
+ExecStop=/opt/erezadmin/venv/erezadmin/bin/celery \
+    multi \
+    stopwait \
+    worker \
+    --logfile=/var/log/erezadmin/celery.log \
+    --pidfile=/run/erezadmin/celery.pid
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,20 @@
+---
+time_zone: America/New_York
+aws: True
+aws_backup_bucket: erezlife-us-backups
+aws_sftp_bucket: erezlife-us-sftp
+aws_upload_bucket: erezlife-us-uploads
+aws_tmp_bucket: erezlife-us-tmp
+aws_region: us-east-1
+aws_lambda_namespace: erezlife
+aws_log_group: /us-erezlife
+aws_elb_subnets:
+  - 172.17.0.0/24 # US Production Public
+  - 172.17.3.0/24 # US Production Public 2
+cache_host: us-cache.8nkwof.0001.use1.cache.amazonaws.com
+config_host: config-us.erezlife.com
+credential_path: us.erezlife.com
+database_host: us-production-db.c6jodfdoqn4t.us-east-1.rds.amazonaws.com
+erezadmin_country_code: US
+# Amazon internal DNS, only available to Amazon hosted VMs.
+nginx_resolver: 169.254.169.253

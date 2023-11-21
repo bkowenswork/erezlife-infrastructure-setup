@@ -1,0 +1,4 @@
+---
+postgresql_listen_addresses: ''
+postgresql_server: false
+postgresql_persist_data: false

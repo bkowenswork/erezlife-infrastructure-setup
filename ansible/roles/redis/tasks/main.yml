@@ -1,0 +1,23 @@
+---
+- name: Install Redis
+  yum:
+    name: redis
+
+- name: Allow external Redis access
+  lineinfile:
+    path: /etc/redis.conf
+    regexp: "^bind\\b"
+    line: bind 0.0.0.0
+  notify: Restart Redis
+
+- name: Override redis.service
+  copy:
+    src: override.conf
+    dest: /etc/systemd/system/redis.service.d/
+  notify: Reload systemd
+
+- name: Start and enable Redis
+  systemd:
+    name: redis
+    state: started
+    enabled: yes

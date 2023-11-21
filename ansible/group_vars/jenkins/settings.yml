@@ -1,0 +1,11 @@
+---
+aws_region: ca-central-1
+cidr: 10.0.1.0/24
+credential_path: jenkins
+skip_restart: False
+vpns:
+  - {name: ca, ip: 52.60.212.161, cidr: 172.16.0.0/16}
+  - {name: us, ip: 34.192.108.36, cidr: 172.17.0.0/16}
+
+# Amazon internal DNS, only available to Amazon hosted VMs.
+nginx_resolver: 169.254.169.253

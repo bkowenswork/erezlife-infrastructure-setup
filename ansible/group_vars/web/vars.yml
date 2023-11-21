@@ -1,0 +1,15 @@
+---
+# /!\ Changing values here may incur additional costs.
+cloudwatch_log_extra_files:
+  - file_path: /var/log/erezadmin/celery.log
+    log_group_name: "{{ inventory_hostname }}"
+    log_stream_name: erezadmin-celery
+    timestamp_format: "%Y-%m-%d %H:%M:%S"
+  - file_path: /var/log/php-fpm/error.log
+    log_group_name: "{{ inventory_hostname }}"
+    log_stream_name: php-error
+    timestamp_format: "%d-%b-%Y %H:%M:%S"
+  - file_path: /var/log/simplesaml/simplesamlphp.log
+    log_group_name: "{{ inventory_hostname }}"
+    log_stream_name: simplesamlphp
+    timestamp_format: "%b %d %H:%M:%S"

@@ -1,0 +1,4 @@
+---
+- name: Install system packages
+  yum:
+    name: time

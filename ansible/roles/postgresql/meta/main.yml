@@ -1,0 +1,3 @@
+---
+dependencies:
+  - common  # EPEL for llvm5.0-devel.

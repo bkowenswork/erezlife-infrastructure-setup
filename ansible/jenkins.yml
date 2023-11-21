@@ -1,0 +1,10 @@
+---
+- hosts: jenkins
+  roles:
+    - common
+    - ssh_access
+    - python3
+    - php
+    - redis
+    - jenkins
+    - ssm

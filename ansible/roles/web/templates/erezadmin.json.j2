@@ -1,0 +1,48 @@
+{
+    "debug": {{ debug | to_json }},
+    "email": "{{ email }}",
+    "secret_key": "{{ erezadmin_secret_key }}",
+    "allowed_hosts": ["{{ hostvars[groups[proxy_target][0]].inventory_hostname }}"],
+    "country_code": "{{ erezadmin_country_code }}",
+    "tmp": "/opt/erezadmin/tmp",
+    "database": {
+        "engine": "django.db.backends.postgresql",
+        "name": "erezadmin",
+        "user": "erezadmin",
+        "password": "{{ erezadmin_database_password }}",
+        "host": "{{ database_host }}"
+    },
+    "hosts": {
+        "cache": "{{ cache_host }}",
+        "config": "{{ config_host }}",
+        "proxy": "{{ hostvars[groups[proxy_target][0]].ansible_host }}",
+        "sftp": "{{ hostvars[groups[sftp_target][0]].ansible_host }}",
+        "web": "{{ ansible_host }}"
+    },
+    "erezadmin_broker_host": "amqp://erezadmin:{{ erezadmin_broker_password }}@localhost/erezadmin",
+    "auth_token": "{{ erezadmin_auth_token }}",
+    "aws_backup_bucket": "{{ aws_backup_bucket }}",
+    "aws": {
+        "access_key_id": "{{ aws_root_access_key_id }}",
+        "secret_access_key": "{{ aws_root_secret_access_key }}",
+        "sftp_bucket": "{{ aws_sftp_bucket }}",
+        "upload_bucket": "{{ aws_upload_bucket }}",
+        "tmp_bucket": "{{ aws_tmp_bucket }}",
+        "region": "{{ aws_region }}",
+        "lambda_namespace": "{{ aws_lambda_namespace }}",
+        "lambda_timeout": 900,
+        "log_group": "{{ aws_log_group }}"
+    },
+    "erezlife_path": "/opt/erezlife",
+    "erezlife_github_webhook_secret": "{{ erezlife_github_webhook_secret }}",
+    "jenkins_auth_token": "{{ jenkins_erezlife_deploy_pr_token }}",
+    "saml_cron_key": "{{ saml_cron_key }}",
+    "uservoice": {
+        "api_key": "{{ uservoice_api_key }}",
+        "sso_key": "{{ uservoice_sso_key }}"
+    },
+    "sentry": {
+        "erezadmin": "{{ sentry_erezadmin_dsn }}",
+        "erezlife": "{{ sentry_dsn }}"
+    }
+}

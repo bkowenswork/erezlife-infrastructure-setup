@@ -1,0 +1,42 @@
+[web:children]
+ca_web
+us_web
+
+[ca:children]
+ca_web
+ca_proxy
+ca_sftp
+ca_bastion
+
+[ca_web]
+erezlife-ca-web ansible_host=172.16.1.10 ansible_user=centos ansible_ssh_private_key_file=ssh/aws_ca.pem
+
+[ca_proxy]
+ca.erezlife.com ansible_host=172.16.1.100 ansible_user=centos ansible_ssh_private_key_file=ssh/aws_ca.pem
+
+[ca_sftp]
+sftp.ca.erezlife.com ansible_host=sftp.ca.erezlife.com ansible_user=centos ansible_ssh_private_key_file=ssh/aws_ca.pem
+
+[ca_bastion]
+erezlife-ca-bastion ansible_host=bastion.ca.erezlife.com ansible_user=centos ansible_ssh_private_key_file=ssh/aws_ca.pem
+
+[us:children]
+us_web
+us_proxy
+us_sftp
+us_bastion
+
+[us_web]
+erezlife-us-web ansible_host=172.17.1.10 ansible_user=centos ansible_ssh_private_key_file=ssh/aws_us.pem
+
+[us_proxy]
+us.erezlife.com ansible_host=172.17.1.100 ansible_user=centos ansible_ssh_private_key_file=ssh/aws_us.pem
+
+[us_sftp]
+sftp.us.erezlife.com ansible_host=sftp.us.erezlife.com ansible_user=centos ansible_ssh_private_key_file=ssh/aws_us.pem
+
+[us_bastion]
+erezlife-us-bastion ansible_host=bastion.us.erezlife.com ansible_user=centos ansible_ssh_private_key_file=ssh/aws_us.pem
+
+[jenkins]
+jenkins.erezlife.com ansible_host=52.60.118.163 ansible_user=centos ansible_ssh_private_key_file=ssh/aws_jenkins.pem

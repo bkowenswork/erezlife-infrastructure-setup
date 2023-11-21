@@ -1,0 +1,6 @@
+---
+dependencies:
+  - development_tools
+  - rabbitmq
+  - systemd
+  - tcp_keepalive

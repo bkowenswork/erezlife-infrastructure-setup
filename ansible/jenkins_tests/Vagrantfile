@@ -1,0 +1,49 @@
+Vagrant.configure("2") do |config|
+  config.vm.define "jenkins-test.erezlife.com" do |new_box|
+    new_box.vm.box = "centos/7"
+    new_box.vm.hostname = "jenkins-test.erezlife.com"
+    new_box.vm.network "private_network", ip: "192.168.57.2"
+    new_box.vm.synced_folder ".", "/vagrant", disabled: true
+
+    new_box.vm.provider "virtualbox" do |vb|
+      vb.memory = "768"
+    end
+
+    new_box.vm.provision "shell", inline: "sudo yum upgrade -y ca-certificates"
+
+    new_box.vm.provision "ansible" do |ansible|
+      ansible.config_file = "../ansible.cfg"
+      ansible.playbook_command = "../venv/bin/ansible-playbook"
+      ansible.playbook = "../jenkins.yml"
+      ansible.limit = "all"
+      ansible.groups = {
+        "jenkins" => ["jenkins-test.erezlife.com"],
+      }
+      ansible.host_vars = {
+        "jenkins-test.erezlife.com" => {
+          "bors_client_id" => "bors_client_id",
+          "bors_client_secret" => "bors_client_secret",
+          "bors_integration_pem" => "bors_integration_pem",
+          "bors_secret_key" => "bors_secret_key",
+          "bors_webhook_secret" => "bors_webhook_secret",
+          # Vagrant inventory uses ansible INI style. It uses ast.literal_eval
+          # to get the value of inventory variables.
+          # (https://docs.ansible.com/ansible/devel/plugins/inventory/ini.html#synopsis)
+          # Write the string "True" to Vagrant’s inventory, so that ansible
+          # reads the boolean True when it parses the INI.
+          "debug" => "True",
+          "email" => "never@sent.org",
+          "jenkins_erezlife_deploy_pr_token": "jenkins_erezlife_deploy_pr_token",
+          "jenkins_token" => "cookies_are_good",
+          "nginx_resolver" => "9.9.9.9",
+          "smtp_password" => "bar",
+          "smtp_username" => "foo",
+          "vpns" => [],
+        },
+      }
+      ansible.extra_vars = {"target" => "jenkins-test.erezlife.com"}
+    end
+
+    new_box.vm.provision "shell", inline: "sudo --user jenkins cat ~jenkins/users/initial-passwords"
+  end
+end

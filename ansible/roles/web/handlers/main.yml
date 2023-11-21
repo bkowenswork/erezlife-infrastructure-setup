@@ -1,0 +1,30 @@
+---
+- name: Check if erezadmin is installed
+  stat:
+    path: /opt/erezadmin/src/erezadmin
+  register: erezadmin_status
+  listen: Restart erezadmin
+
+- name: Restart erezadmin web worker
+  file:
+    path: /etc/uwsgi.d/erezadmin.ini
+    state: touch
+  when: erezadmin_status.stat.exists
+  listen: Restart erezadmin
+
+- name: Restart erezadmin celery
+  systemd:
+    name: erezadmin-celery
+    state: restarted
+  when: erezadmin_status.stat.exists
+  listen: Restart erezadmin
+
+- name: Reload PHP-FPM
+  become_user: erezadmin
+  composer:
+    global_command: yes
+    command: exec
+    arguments: "cachetool --
+      opcache:reset
+      --fcgi='{{ ansible_host }}:{{ php_fpm_listen_port }}'
+      --tmp-dir=/var/run/erezlife/cachetool"

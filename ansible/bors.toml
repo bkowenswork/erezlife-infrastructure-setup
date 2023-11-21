@@ -1,0 +1,10 @@
+block_labels = [
+    "discussion",
+    "feedback-wanted",
+    "needs-ticket",
+    "pending",
+    "work-in-progress",
+]
+required_approvals = 1
+status = ["continuous-integration/jenkins/%"]
+use_squash_merge = true

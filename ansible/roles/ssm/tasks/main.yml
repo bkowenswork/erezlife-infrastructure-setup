@@ -1,0 +1,10 @@
+---
+- name: Install Amazon SSM agent
+  yum:
+    name: https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+
+- name: Start and enable Amazon SSM agent
+  systemd:
+    name: amazon-ssm-agent
+    state: started
+    enabled: yes

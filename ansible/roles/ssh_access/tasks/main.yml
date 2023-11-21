@@ -1,0 +1,54 @@
+---
+- name: Create the developers group
+  group:
+    name: developers
+
+- name: Enable sudo without password for developers
+  copy:
+    content: "%developers ALL=(ALL:ALL) NOPASSWD:ALL"
+    dest: /etc/sudoers.d/developers_nopassword
+    mode: 0440
+    validate: /usr/sbin/visudo --check --strict --file %s
+
+- name: Add UNIX accounts
+  user:
+    name: "{{ item['github_username'] }}"
+    comment: "{{ item['first_name'] }} {{ item['last_name'] }}, {{ item['email'] }}"
+    groups: developers
+  loop: "{{ erezlife_users }}"
+  when: item['github_username'] is defined
+
+- name: Gather GitHub usernames
+  set_fact:
+    github_usernames: "{{
+      erezlife_users
+      | map(attribute='github_username')
+      | reject('undefined')
+      }}"
+
+- name: Set authorized keys
+  authorized_key:
+    user: "{{ item }}"
+    exclusive: yes
+    key: https://github.com/{{ item }}.keys
+  loop: "{{ github_usernames }}"
+
+- name: Gather members of the developers group
+  command: lid --group developers --onlynames
+  changed_when: false
+  register: developers_members
+
+- name: Gather usernames to remove
+  set_fact:
+    names_to_remove: "{{
+      developers_members.stdout_lines
+      | map('trim')
+      | difference(github_usernames)
+      }}"
+
+- name: Remove users
+  user:
+    name: "{{ item }}"
+    state: absent
+    remove: yes
+  loop: "{{ names_to_remove }}"

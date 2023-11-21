@@ -1,0 +1,37 @@
+---
+- name: Install s3fs
+  yum:
+    name: s3fs-fuse
+
+- name: Configure s3fs credentials
+  copy:
+    dest: /etc/passwd-s3fs
+    content: "{{ aws_sftp_access_key_id }}:{{ aws_sftp_secret_access_key }}"
+    mode: "0600"
+  notify: Remount S3FS
+
+- name: Mount upload buckets
+  mount:
+    path: /home/clients/
+    fstype: fuse.s3fs
+    src: "{{ aws_sftp_bucket }}"
+    opts: _netdev,allow_other,noexec,mp_umask=0022,gid=clients,disable_noobj_cache
+    state: mounted
+
+- name: Enable use of s3fs as home directory
+  seboolean:
+    name: use_fusefs_home_dirs
+    state: yes
+    persistent: yes
+
+- name: Make Kernel panic on OOM
+  sysctl:
+    name: vm.panic_on_oom
+    value: '1'
+
+- name: Reboot on kernel panic
+  sysctl:
+    name: kernel.panic
+    # Wait 10 seconds before to reboot, leaving time for helper processes to
+    # gather the debugging info (which process caused the OOM, etc.)
+    value: '10'

@@ -1,0 +1,66 @@
+import hudson.model.User
+import java.nio.file.attribute.PosixFilePermission
+import java.nio.file.Files
+import java.nio.file.Paths
+import jenkins.model.Jenkins
+import org.apache.commons.lang.RandomStringUtils
+
+def users = [
+    [username: 'jenkins', full_name: 'Jenkins', cli: true],
+{% for user in erezlife_users %}
+    [username: '{{ user.email }}', full_name: '{{ user.first_name }} {{ user.last_name }}'],
+{% endfor %}
+]
+
+def inst = Jenkins.getInstance()
+
+def usernames = []
+for (spec in users) {
+    usernames << spec['username']
+}
+for (user in User.getAll()) {
+    if (!usernames.contains(user.getId())) {
+        user.delete()
+    }
+}
+
+def initial_passwords = []
+def cli_passwords = []
+for (spec in users) {
+    user = User.getById(spec['username'], false)
+    if (!user) {
+        def password = RandomStringUtils.randomAlphanumeric(16)
+        user = inst.securityRealm.createAccount(spec['username'], password)
+        def password_pair = "${spec['username']}:${password}"
+        if (spec.get('cli', false)) {
+            cli_passwords << password_pair
+        } else {
+            initial_passwords << password_pair
+        }
+    }
+    user.setFullName(spec['full_name'])
+    user.save()
+}
+
+def root = inst.getRootDir().getPath()
+def perms = [PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE].toSet()
+
+def initial = Paths.get(root, 'users', 'initial-passwords')
+if (initial_passwords) {
+    new File(initial.toString()).withWriterAppend('utf-8') { writer ->
+        for (line in initial_passwords) {
+            writer.writeLine(line)
+        }
+    }
+    Files.setPosixFilePermissions(initial, perms)
+}
+
+def cli = Paths.get(root, 'jenkins-cli-auth')
+if (cli_passwords) {
+    new File(cli.toString()).withWriterAppend('utf-8') { writer ->
+        for (line in cli_passwords) {
+            writer.writeLine(line)
+        }
+    }
+    Files.setPosixFilePermissions(cli, perms)
+}

@@ -1,0 +1,13 @@
+---
+- name: Install additional packages
+  yum:
+    name:
+      - ghostscript
+      # Required by the Pillow Python package
+      - libffi-devel
+      - libjpeg-turbo-devel
+      - libtiff-devel
+      - zlib-devel
+      # Required by python-ldap Python package
+      - openldap-clients
+      - openldap-devel

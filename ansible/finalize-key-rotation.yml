@@ -1,0 +1,25 @@
+---
+- hosts: "{{ target_group }}"
+
+  vars:
+
+    local_key_path: "{{ ansible_ssh_private_key_file }}"
+    public_local_key_path: "{{ local_key_path }}.pub"
+
+  tasks:
+
+    - name: Remove outdated SSH key material
+      authorized_key:
+        user: "{{ ansible_user }}"
+        key: "{{ lookup('file', '{{ public_local_key_path }}') }}"
+        exclusive: True
+
+    - name: Replace old SSH public key from AWS account
+      run_once: True
+      become: False
+      local_action:
+        module: amazon.aws.ec2_key
+        region: "{{ aws_region }}"
+        name: "{{ local_key_path | basename | splitext | first }}"
+        key_material: "{{ lookup('file', '{{ public_local_key_path }}') }}"
+      when: not debug

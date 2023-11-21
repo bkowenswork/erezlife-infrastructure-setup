@@ -1,0 +1,107 @@
+require 'json'
+
+File.open("config.json") do |pref_file|
+    @prefs = JSON.load(pref_file)
+end
+
+Vagrant.configure("2") do |config|
+    boxes = ["db", "test.erezlife.com", "webvm", "cache", "config", "sftp", "bastion"]
+    boxes.each_with_index do |name, i|
+        config.vm.define name do |new_box|
+            new_box.vm.box = "centos/7"
+            new_box.vm.hostname = name
+            new_box.vm.network "private_network", ip: "192.168.56.#{10+i}"
+            new_box.vm.provider "virtualbox" do |vm|
+                vm.cpus = 2
+            end
+            new_box.vm.synced_folder ".", "/vagrant", disabled: true
+
+            if name == boxes.last
+                # Define all boxes and take advantage of ansible parallel execution
+                # https://www.vagrantup.com/docs/provisioning/ansible.html#ansible-parallel-execution
+                new_box.vm.provision :ansible do |ansible|
+                    ansible.playbook_command = "venv/bin/ansible-playbook"
+                    ansible.playbook = "vagrant.yml"
+                    ansible.limit = "all"
+                    ansible.groups = {
+                        "test:children" => [
+                            "test_db",
+                            "test_proxy",
+                            "test_sftp",
+                            "test_web",
+                            "test_bastion",
+                        ],
+                        "web:children" => ["test_web"],
+                        "test_cache" => ["cache"],
+                        "test_config" => ["config"],
+                        "test_db" => ["db"],
+                        "test_sftp" => ["sftp"],
+                        "test_proxy" => ["test.erezlife.com"],
+                        "test_web" => ["webvm"],
+                        "test_bastion" => ["bastion"],
+                        "test:vars" => {
+                            "aws_region" => @prefs["aws_region"],
+                            "aws_lambda_namespace" => @prefs["aws_lambda_namespace"],
+                            "aws_log_group" => @prefs["aws_log_group"],
+                            "aws_backup_bucket" => @prefs["aws_backup_bucket"],
+                            "aws_sftp_bucket" => @prefs["aws_sftp_bucket"],
+                            "aws_upload_bucket" => @prefs["aws_upload_bucket"],
+                            "aws_tmp_bucket" => @prefs["aws_tmp_bucket"],
+                            "cache_host" => "192.168.56.13",
+                            "config_host" => "192.168.56.14",
+                            "database_host": "192.168.56.10",
+                            "erezadmin_database_password" => "erezadmin_database_password",
+                            "nginx_resolver" => "9.9.9.9",
+                            "time_zone" => "America/Toronto",
+                        },
+                    }
+                    ansible.host_vars = {
+                        "test.erezlife.com" => {
+                            "ansible_host" => "192.168.56.11",
+                            "ansible_port" => 22,
+                            "proxy_listen_https" => true,
+                        },
+                        "webvm" => {
+                            "ansible_host" => "192.168.56.12",
+                            "ansible_port" => 22,
+                            "erezadmin_auth_token" => "erezadmin_auth_token",
+                            "erezadmin_broker_password" => "erezadmin_broker_password",
+                            "erezadmin_secret_key" => "erezadmin_secret_key",
+                            "saml_admin_password" => "saml_admin_password",
+                            "saml_cron_key" => "saml_cron_key",
+                            "saml_default_secretsalt" => "saml_default_secretsalt",
+                        },
+                        "sftp" => {
+                            "ansible_host" => "192.168.56.15",
+                            "ansible_port" => 22,
+                        },
+                        "bastion" => {
+                            "ansible_host" => "192.168.56.16",
+                            "ansible_port" => 22,
+                        },
+                    }
+                    ansible.extra_vars = {
+                        "region_target" => "test",
+                        "proxy_target" => "test_proxy",
+                        "sftp_target" => "test_sftp",
+                        "web_target" => "test_web",
+                        "bastion_target" => "test_bastion",
+                        "debug" => @prefs["debug"],
+                        "email" => @prefs["email"],
+                        "erezlife_github_webhook_secret" => "erezlife_github_webhook_secret",
+                        "jenkins_erezlife_deploy_pr_token" => "jenkins_erezlife_deploy_pr_token",
+                        "erezlife_users" => [
+                            {
+                                "email": @prefs["email"],
+                                "first_name": @prefs["first_name"],
+                                "last_name": @prefs["last_name"],
+                                "github_username": @prefs["github_username"],
+                                "site_superuser": true,
+                            },
+                        ],
+                    }
+                end
+            end
+        end
+    end
+end

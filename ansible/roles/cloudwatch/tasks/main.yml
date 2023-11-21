@@ -1,0 +1,16 @@
+---
+- name: Install Amazon CloudWatch agent
+  yum:
+    name: https://s3.amazonaws.com/amazoncloudwatch-agent/centos/amd64/latest/amazon-cloudwatch-agent.rpm
+
+- name: Configure metrics for Amazon CloudWatch agent
+  copy:
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    content: "{{ cloudwatch_config|to_nice_json(indent=2) }}"
+  notify: Restart Amazon CloudWatch agent
+
+- name: Start and enable Amazon CloudWatch agent
+  systemd:
+    name: amazon-cloudwatch-agent
+    state: started
+    enabled: yes

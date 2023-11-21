@@ -1,0 +1,30 @@
+---
+- name: Start bors-ng
+  docker_container:
+    container_default_behavior: no_defaults
+    name: bors-ng
+    image: borsng/bors-ng
+    env:
+      PUBLIC_HOST: bors.erezlife.com
+      DATABASE_USE_SSL: "false"
+      SECRET_KEY_BASE: "{{ bors_secret_key }}"
+      GITHUB_CLIENT_ID: "{{ bors_client_id }}"
+      GITHUB_CLIENT_SECRET: "{{ bors_client_secret }}"
+      # Github App ID
+      GITHUB_INTEGRATION_ID: "55586"
+      GITHUB_INTEGRATION_PEM: "{{ bors_integration_pem }}"
+      GITHUB_WEBHOOK_SECRET: "{{ bors_webhook_secret }}"
+      DATABASE_URL: "postgresql://postgres:{{ bors_database_password }}@bors.c6qt9eoiqvea.ca-central-1.rds.amazonaws.com:5432/bors"
+    published_ports:
+      - 4000:4000
+    pull: true
+    # Bors requires an app to be setup on the provisioner’s GitHub account.
+    # Pull the image and connect it to docker network to keep close to the real
+    # instance, but do not restart container on failure.
+    restart_policy: "{{ debug|ternary('no', 'always') }}"
+
+- name: Bors NGINX configuration
+  copy:
+    src: bors.conf
+    dest: /etc/nginx/conf.d/bors.conf
+  notify: Reload NGINX

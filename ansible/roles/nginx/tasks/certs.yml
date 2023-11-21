@@ -1,0 +1,28 @@
+---
+- name: Copy cert
+  copy:
+    src: server.crt
+    dest: /etc/pki/tls/certs/
+  notify: Reload NGINX
+
+- name: Copy cert key
+  copy:
+    src: server.key
+    dest: /etc/pki/tls/private/
+  notify: Reload NGINX
+
+- name: Download GoDaddy intermediate cert
+  get_url:
+    url: https://certs.godaddy.com/repository/gdig2.crt.pem
+    dest: /etc/pki/tls/certs/gdig2.crt
+    force: yes
+  notify: Reload NGINX
+
+- name: Create certificate chain
+  shell: cat /etc/pki/tls/certs/server.crt /etc/pki/tls/certs/gdig2.crt > /etc/pki/tls/certs/server-chain.crt
+
+- name: Create dhparams.pem
+  command: openssl dhparam -out /etc/pki/tls/certs/dhparams.pem 2048
+  args:
+    creates: /etc/pki/tls/certs/dhparams.pem
+  notify: Reload NGINX

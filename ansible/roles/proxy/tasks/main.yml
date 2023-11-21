@@ -1,0 +1,36 @@
+---
+- import_tasks: sudoers.yml
+
+- name: Install error pages
+  template:
+    src: "error/{{ item }}.j2"
+    dest: "/usr/share/nginx/html/{{ item }}"
+  loop:
+    - 404.html
+    - 413.html
+    - 503.html
+
+- name: Configure NGINX
+  template:
+    src: nginx_erezlife.conf.j2
+    dest: /etc/nginx/conf.d/erezlife.conf
+  notify: Reload NGINX
+
+- name: Create erezlife NGINX config paths
+  file:
+    path: "/etc/nginx/conf.d/{{ item }}"
+    state: directory
+    owner: erezadmin
+    group: erezadmin
+  loop:
+    - location
+    - upstream
+    - server
+
+- name: Create NGINX shared HTTP listening configuration
+  copy:
+    src: http_listen.conf
+    dest: /etc/nginx/conf.d/include/http_listen.conf
+  notify: Reload NGINX
+
+- import_tasks: simplesaml.yml

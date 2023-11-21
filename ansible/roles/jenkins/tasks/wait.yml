@@ -1,0 +1,9 @@
+- name: Wait for Jenkins to start up
+  uri:
+    url: "http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/login"
+  register: result
+  # -1: Connection refused (server not accepting connections)
+  # 503: Service unavailable (Jenkins loading configuration)
+  until: result.status not in [-1, 503]
+  retries: 10
+  delay: 5

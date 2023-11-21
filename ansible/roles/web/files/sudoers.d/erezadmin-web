@@ -1,0 +1,5 @@
+# Avoid adding new commands. Update erezadmin instead.
+%erezadmin ALL = NOPASSWD: /bin/scl enable rh-python38 -- /opt/erezadmin/src/erezadmin/scripts/erezadmin *
+
+# Allow erezadmin to run commands as erezlife.
+%erezadmin ALL = (erezlife) NOPASSWD: ALL

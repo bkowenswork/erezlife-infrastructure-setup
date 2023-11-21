@@ -1,0 +1,57 @@
+---
+- import_role:
+    name: php
+
+- name: Install PHP-FPM
+  yum:
+    name: php-fpm
+    state: latest
+
+# Required to connect to Redis.
+- name: Allow network connections from PHP-FPM
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+
+- name: Allow database connections from PHP-FPM
+  seboolean:
+    name: httpd_can_network_connect_db
+    state: yes
+    persistent: yes
+
+- name: Create php-fpm systemd path
+  file:
+    path: /etc/systemd/system/php-fpm.service.d
+    state: directory
+
+- name: Copy php-fpm systemd override.conf
+  copy:
+    src: roles/common/files/override.conf
+    dest: /etc/systemd/system/php-fpm.service.d/override.conf
+
+- name: Set process_control_timeout
+  ini_file:
+    dest: /etc/php-fpm.conf
+    section: global
+    option: process_control_timeout
+    value: "{{ php_max_execution_time }}"
+  notify: Restart PHP-FPM
+
+- name: Remove default PHP-FPM configuration
+  file:
+    path: /etc/php-fpm.d/www.conf
+    state: absent
+  notify: Restart PHP-FPM
+
+- name: Copy PHP-FPM configuration
+  template:
+    src: erezlife.php-fpm.conf.j2
+    dest: /etc/php-fpm.d/erezlife.conf
+  notify: Restart PHP-FPM
+
+- name: Enable PHP-FPM
+  systemd:
+    name: php-fpm
+    enabled: yes
+    state: started

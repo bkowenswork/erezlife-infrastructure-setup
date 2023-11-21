@@ -1,0 +1,6 @@
+---
+- name: Install development tools
+  yum:
+    name:
+      - "@Development tools"
+      - ccache

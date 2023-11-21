@@ -1,0 +1,20 @@
+---
+time_zone: America/Toronto
+aws: True
+aws_backup_bucket: erezlife-ca-backups
+aws_sftp_bucket: erezlife-ca-sftp
+aws_upload_bucket: erezlife-ca-uploads
+aws_tmp_bucket: erezlife-ca-tmp
+aws_region: ca-central-1
+aws_lambda_namespace: erezlife
+aws_log_group: /ca-erezlife
+aws_elb_subnets:
+  - 172.16.0.0/24 # CA Production Public
+  - 172.16.3.0/24 # CA Production Public 2
+cache_host: ca-cache.77gwok.0001.cac1.cache.amazonaws.com
+config_host: config-ca.erezlife.com
+credential_path: ca.erezlife.com
+database_host: ca-production-db.c6qt9eoiqvea.ca-central-1.rds.amazonaws.com
+erezadmin_country_code: CA
+# Amazon internal DNS, only available to Amazon hosted VMs.
+nginx_resolver: 169.254.169.253

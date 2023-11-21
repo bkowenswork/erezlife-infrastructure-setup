@@ -1,0 +1,15 @@
+---
+- name: Add erezadmin user
+  user:
+    name: erezadmin
+    shell: /bin/bash
+    generate_ssh_key: true
+    ssh_key_comment: "erezadmin@{{ inventory_hostname }}"
+
+- name: Authorize erezadmin user to SSH from Jenkins
+  template:
+    src: authorized_keys.j2
+    dest: ~erezadmin/.ssh/authorized_keys
+    owner: erezadmin
+    group: erezadmin
+    mode: 0440

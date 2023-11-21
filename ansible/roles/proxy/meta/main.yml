@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: nginx
+    vars:
+      nginx_https: "{{ proxy_listen_https }}"

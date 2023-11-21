@@ -1,0 +1,51 @@
+#!groovy
+
+void scl(String cmd) {
+    sh "scl enable rh-python38 -- ${cmd}"
+}
+
+pipeline {
+  agent any
+
+  options {
+    disableConcurrentBuilds()
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout([
+          $class: 'GitSCM',
+          branches: scm.branches,
+          extensions: scm.extensions + [[$class: 'CleanBeforeCheckout']],
+          userRemoteConfigs: scm.userRemoteConfigs
+        ])
+      }
+    }
+
+    stage('Build') {
+      steps {
+        scl 'make'
+        sh 'make credentials'
+      }
+    }
+
+    stage('Lint') {
+      steps {
+        sh 'make lint'
+      }
+    }
+
+    stage('generate-password') {
+      steps {
+        sh 'make generate-passwords'
+      }
+    }
+  }
+
+  post {
+    failure {
+      step([$class: 'Mailer', recipients: 'bugs@erezlife.com', sendToIndividuals: true])
+    }
+  }
+}

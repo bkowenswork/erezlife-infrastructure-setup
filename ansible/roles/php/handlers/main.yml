@@ -1,0 +1,3 @@
+---
+- name: PHP changed
+  command: /usr/bin/true

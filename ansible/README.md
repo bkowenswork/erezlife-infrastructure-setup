@@ -1,23 +1,8 @@
 # Provision with Vagrant
 
-#### Enable RPM Fusion Free Repositories (if not already):
-```console
-$ sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-```
-
-#### Install VirtualBox as provider for Vagrant
-```console
-$ sudo dnf install VirtualBox
-```
-#### Install Vagrant
-```console
-$ sudo dnf install -y dnf-plugins-core
-$ sudo dnf config-manager --add-repo https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
-$ sudo dnf -y install vagrant
-```
-#### Reboot (Otherwise, Vagrant will not find a provider and throw an error)
-- reboot
-
+First ensure your OS is supported by VirtualBox. Then follow the `VirtualBox`
+[installation guide](https://www.virtualbox.org/wiki/Linux_Downloads) and
+install `vagrant` with `dnf install vagrant`.
 
 ## ansible-server-setup
 
@@ -67,7 +52,7 @@ $ sudo dnf -y install vagrant
 
 6. Run `make` to create the virtual environment.
 7. Fetch credentials with `make test-credentials`
-8. `vagrant up` *You may to force it to use virtualbox: `export VAGRANT_DEFAULT_PROVIDER=virtualbox`*
+8. `vagrant up`
 9. *Wait for about half an hour until provisioning is complete.*
 10. Add following line to `/etc/hosts`
     ```

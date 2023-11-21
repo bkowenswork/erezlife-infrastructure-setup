@@ -1,0 +1,12 @@
+---
+- import_tasks: packages.yml
+- import_tasks: system_users.yml
+- import_tasks: system_paths.yml
+- import_tasks: crontab.yml
+- import_role:
+    name: php-fpm
+- import_tasks: erezadmin.yml
+- import_tasks: rabbitmq.yml
+- import_tasks: saml.yml
+- import_tasks: ssh.yml
+- import_tasks: apply_selinux.yml

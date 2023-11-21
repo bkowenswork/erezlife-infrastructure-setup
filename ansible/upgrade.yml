@@ -1,0 +1,7 @@
+---
+- hosts: all
+  tasks:
+    - name: Update OS packages (may take awhile)
+      yum:
+        name: "*"
+        state: latest

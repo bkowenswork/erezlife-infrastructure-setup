@@ -1,0 +1,28 @@
+---
+- name: Create additional directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: erezadmin
+    group: erezadmin
+  loop:
+    - /opt/erezlife
+    - /opt/erezlife/sites
+    - /opt/erezlife/src
+    - /opt/erezlife/vendor
+    - /opt/erezlife/venv
+    - /var/log/erezlife
+
+# Required for PHP-FPM to write to /var/log/erezlife.
+- name: Set /var/log/erezlife SELinux context
+  sefcontext:
+    target: "/var/log/erezlife(/.*)?"
+    setype: httpd_log_t
+
+- name: Create temporary directories
+  copy:
+    src: tmpfile_erezlife.conf
+    dest: /etc/tmpfiles.d/erezlife.conf
+
+- name: Create directories
+  command: /usr/bin/systemd-tmpfiles --create /etc/tmpfiles.d/erezlife.conf

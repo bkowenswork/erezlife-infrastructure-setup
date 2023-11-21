@@ -1,0 +1,10 @@
+[erezlife]
+user = erezlife
+group = erezlife
+listen = {{ ansible_host }}:{{ php_fpm_listen_port }}
+
+pm = dynamic
+pm.max_children = 100
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="referrer" content="origin">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>{% include 'error.css.j2' %}</style>
+    <title>Upload is too large</title>
+  </head>
+  <body>
+    <div class="page_section">
+      <h1>Upload is too large</h1>
+    </div>
+    <div class="page_section">
+      <p>You have sent a request that is too big. It could be that you are trying to upload a file greater than {{ client_max_body_size }}. Please try again with a smaller request or file.</p>
+    </div>
+  </body>
+</html>

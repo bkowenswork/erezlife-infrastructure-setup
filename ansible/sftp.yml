@@ -1,0 +1,6 @@
+---
+- hosts: "{{ sftp_target }}"
+  roles:
+    - role: erezadmin
+      erezadmin_allow_ssh_from_web: yes
+    - sftp

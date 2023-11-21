@@ -1,0 +1,41 @@
+---
+# /!\ Changing values here may incur additional costs.
+cloudwatch_config:
+  metrics:
+    namespace: "{{ inventory_hostname }}"
+    metrics_collected:
+      cpu:
+        total_cpu: true
+        measurement:
+          - usage_guest
+          - usage_iowait
+          - usage_user
+          - usage_system
+      mem:
+        measurement:
+          - available
+          - buffered
+          - cached
+          - used
+      processes:
+        measurement:
+          - running
+          - sleeping
+          - total
+  logs:
+    logs_collected:
+      files:
+        collect_list: "{{ cloudwatch_log_files + cloudwatch_log_extra_files|default([]) }}"
+cloudwatch_log_files:
+  - file_path: /var/log/messages
+    log_group_name: "{{ inventory_hostname }}"
+    log_stream_name: system-messages
+    timestamp_format: "%b %d %H:%M:%S"
+  - file_path: /var/log/secure
+    log_group_name: "{{ inventory_hostname }}"
+    log_stream_name: system-secure
+    timestamp_format: "%b %d %H:%M:%S"
+  - file_path: /var/log/yum.log
+    log_group_name: "{{ inventory_hostname }}"
+    log_stream_name: system-yum.log
+    timestamp_format: "%b %d %H:%M:%S"

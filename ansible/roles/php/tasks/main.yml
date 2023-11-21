@@ -1,0 +1,38 @@
+---
+- name: Install Remi epel package
+  yum:
+    name: "https://rpms.remirepo.net/enterprise/remi-release-7.rpm"
+
+- name: Enable Remi PHP RPM repository
+  command: yum-config-manager --enable remi-php80
+
+- name: Install PHP dependencies
+  yum:
+    name:
+      - php-cli
+      - php-gd
+      - php-intl
+      - php-mbstring
+      - php-pecl-redis
+      - php-pecl-zendopcache
+      - php-pgsql
+      - php-soap
+      - php-xml
+      - php-zip
+  notify: PHP changed
+
+- name: Download composer
+  get_url:
+    checksum: 'sha256:https://getcomposer.org/download/latest-stable/composer.phar.sha256sum'
+    url: https://getcomposer.org/download/latest-stable/composer.phar
+    dest: /usr/bin/composer
+    force: yes
+    owner: root
+    group: root
+    mode: 0755
+
+- name:
+  template:
+    src: erezlife.ini.j2
+    dest: /etc/php.d/99-erezlife.ini
+  notify: PHP changed

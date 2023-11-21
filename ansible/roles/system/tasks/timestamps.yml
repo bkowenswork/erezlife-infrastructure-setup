@@ -1,0 +1,5 @@
+---
+- name: Turn off tcp_timestamps
+  sysctl:
+    name: net.ipv4.tcp_timestamps
+    value: '0'

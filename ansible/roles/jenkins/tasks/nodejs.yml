@@ -1,0 +1,14 @@
+---
+- name: Download NodeSource Node.js binary distribution
+  get_url:
+    url: https://rpm.nodesource.com/setup_lts.x
+    dest: ~/nodejs_setup_lts.x
+
+- name: Install Nodesoure Node.js LTS repository to prepare Node.js for install
+  command: bash - ~/nodejs_setup_lts.x
+  args:
+    creates: /etc/yum.repos.d/nodesource-el7.repo
+
+- name: Install Node.js
+  yum:
+    name: nodejs

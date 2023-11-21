@@ -1,0 +1,2 @@
+---
+simplesamlphp_cron_fetch_metadata_url: "https://{{ hostvars[groups[proxy_target][0]].inventory_hostname }}/simplesaml/module.php/cron/cron.php?key={{ saml_cron_key }}&tag=daily"

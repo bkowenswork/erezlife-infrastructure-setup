@@ -1,0 +1,1 @@
+jenkins ALL=NOPASSWD: /usr/bin/systemctl start ipsec, /usr/bin/systemctl stop ipsec

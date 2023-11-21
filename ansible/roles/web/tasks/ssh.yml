@@ -1,0 +1,19 @@
+---
+- include_tasks: ssh_keyscan.yml
+  loop:
+    - "{{ hostvars[groups[proxy_target][0]].ansible_host }}"
+    - "{{ hostvars[groups[sftp_target][0]].ansible_host }}"
+  loop_control:
+    loop_var: host
+
+# NOTE: slurp base64 encodes the contents of the file it reads in,
+#       so pipe it through b64decode when using the data.
+- name: Store public key for erezadmin (from web)
+  become_user: erezadmin
+  slurp:
+    src: ~/.ssh/id_rsa.pub
+  register: result
+
+- name: Set erezadmin key fact
+  set_fact:
+    erezadmin_key: "{{ result.content|b64decode }}"

@@ -1,0 +1,28 @@
+location ^~ /simplesaml/resources/ {
+    alias {{ saml_path }}/www/resources/;
+    gzip 'on';
+}
+
+location /simplesaml/ {
+    # Protect against BREACH (http://breachattack.com/) and HEIST
+    # (https://techzone.ergon.ch/HEIST) by disabling gzip. SimpleSAML must use
+    # SameSite=None (https://github.com/simplesamlphp/simplesamlphp/pull/1153),
+    # therefore allows attackers to trigger requests with clients credentials
+    # from a malicious website.
+
+    rewrite ^/simplesaml(?!/.*?\.php) $request_uri/index.php;
+
+    include /etc/nginx/fastcgi_params;
+
+    fastcgi_index index.php;
+    fastcgi_split_path_info ^/simplesaml(/.*?\.php)(.*)$;
+    fastcgi_param SCRIPT_FILENAME {{ saml_path }}/www$fastcgi_script_name;
+    fastcgi_param SCRIPT_NAME /simplesaml$fastcgi_script_name;
+    fastcgi_param PATH_INFO $fastcgi_path_info if_not_empty;
+
+    # Server is always SSL behind AWS Load Balancer.
+    # Needed for SimpleSAMLphp to generate correct application URLs.
+    fastcgi_param HTTPS 'on';
+
+    fastcgi_pass simplesaml_hosts;
+}

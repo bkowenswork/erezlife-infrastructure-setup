@@ -1,0 +1,35 @@
+---
+- name: Install RabbitMQ
+  yum:
+    name: rabbitmq-server
+
+- name: Copy rabbitmq-env.conf
+  copy:
+    src: rabbitmq-env.conf
+    dest: /etc/rabbitmq/
+    mode: 0644
+  register: rabbit_env
+
+- name: Create rabbitmq-server systemd path
+  file:
+    path: /etc/systemd/system/rabbitmq-server.service.d
+    state: directory
+
+- name: Copy rabbitmq-server systemd override.conf
+  copy:
+    src: roles/common/files/override.conf
+    dest: /etc/systemd/system/rabbitmq-server.service.d/override.conf
+  register: rabbit_override
+
+- name: Restart RabbitMQ
+  systemd:
+    name: rabbitmq-server
+    state: restarted
+    enabled: yes
+  when: rabbit_env.changed or rabbit_override.changed
+
+- name: Remove guest user from rabbitmq
+  rabbitmq_user:
+    user: guest
+    state: absent
+    node: rabbit@localhost

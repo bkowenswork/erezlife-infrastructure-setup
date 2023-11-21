@@ -1,0 +1,7 @@
+---
+dependencies:
+  - role: bors
+  - role: development_tools
+  - role: docker
+  - role: nginx
+  - role: postgresql
