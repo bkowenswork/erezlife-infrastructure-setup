@@ -32,30 +32,30 @@
     name: github.com
     key: "{{ github_host_key.stdout }}"
 
-- name: Start IPSec
-  systemd:
-    name: ipsec
-    state: started
-  when: not debug
+# - name: Start IPSec
+#   systemd:
+#     name: ipsec
+#     state: started
+#   when: not debug
 
-- block:
-    - name: Gather private host keys
-      command: "ssh-keyscan -T 120 {{ item }}"
-      loop: "{{ groups.all|map('extract', hostvars, ['ansible_host'])|difference([ansible_host]) }}"
-      register: host_keys
-      when: not debug
+# - block:
+#     - name: Gather private host keys
+#       command: "ssh-keyscan -T 120 {{ item }}"
+#       loop: "{{ groups.all|map('extract', hostvars, ['ansible_host'])|difference([ansible_host]) }}"
+#       register: host_keys
+#       when: not debug
 
-  always:
-    - name: Stop IPSec
-      systemd:
-        name: ipsec
-        state: stopped
-      when: not debug
+#   always:
+#     - name: Stop IPSec
+#       systemd:
+#         name: ipsec
+#         state: stopped
+#       when: not debug
 
-- name: Add private host keys to known_hosts
-  known_hosts:
-    path: "{{ jenkins_ssh_path }}/known_hosts"
-    name: "{{ item.item }}"
-    key: "{{ item.stdout }}"
-  loop: "{{ host_keys.results }}"
-  when: not debug
+# - name: Add private host keys to known_hosts
+#   known_hosts:
+#     path: "{{ jenkins_ssh_path }}/known_hosts"
+#     name: "{{ item.item }}"
+#     key: "{{ item.stdout }}"
+#   loop: "{{ host_keys.results }}"
+#   when: not debug

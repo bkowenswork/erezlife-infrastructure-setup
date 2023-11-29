@@ -13,13 +13,21 @@
     name:
       - awscli           # Used by download-all-db job
       - graphviz         # Draw graphs in the documentation
-      - hub              # Used by update-packages job
-      - java
+      # - hub              # Used by update-packages job - deprecated in favor of GH
+      - java-11-amazon-corretto
       - openldap-clients # Required by python tests for LDAP
       - openldap-servers # Required by python tests for LDAP
       - openldap-devel   # Required by python-ldap Python package
       - openssl-devel    # Required by cryptography Python package
       - poppler-utils    # Required by PHP test suite
+      - dnf-utils
+
+- name: Add GH repo 
+  ansible.builtin.shell: sudo yum-config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
+
+- name: Install GH 
+  ansible.builtin.dnf:
+    name: gh   
 
 - name: Set SELinux to permissive on slapd_t
   selinux_permissive:

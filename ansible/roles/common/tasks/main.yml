@@ -1,6 +1,7 @@
 ---
 - import_tasks: timezone.yml
-- import_tasks: extra_repos.yml
-- import_tasks: epel.yml
+# - import_tasks: extra_repos.yml
+# - import_tasks: epel.yml
 - import_tasks: packages.yml
 - import_tasks: firewall.yml
+- import_tasks: credentials.yml

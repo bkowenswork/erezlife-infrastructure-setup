@@ -1,7 +1,6 @@
 ---
-- name: Install passlib
-  yum:
-    name: python-passlib
+- name: Add GH repo 
+  ansible.builtin.shell: pip3 install passlib
 
 - name: Create docs directory
   file:
