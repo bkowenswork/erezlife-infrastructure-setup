@@ -1,15 +1,9 @@
 ---
-- name: Add Docker repo
-  command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-  args:
-    creates: /etc/yum.repos.d/docker-ce.repo
-
 - name: Install Docker
   yum:
     name:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
+      - docker
+      - containerd
 
 - name: Enable Docker
   systemd:
@@ -18,5 +12,4 @@
     state: started
 
 - name: Install Python Docker bindings (for Ansible)
-  yum:
-    name: python-docker-py
+  ansible.builtin.command: pip3 install docker

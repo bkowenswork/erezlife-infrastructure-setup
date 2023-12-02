@@ -3,5 +3,5 @@
   yum:
     name:
       - mailcap  # Used by Python's mimetypes module
-      - nmon  # Used to check server activity in case of slowness
-      - policycoreutils-python  # Required by Ansible for handling SELinux.
+#      - nmon  # Used to check server activity in case of slowness
+      - python3-policycoreutils  # Required by Ansible for handling SELinux.

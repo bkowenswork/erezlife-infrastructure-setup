@@ -1,25 +1,32 @@
 ---
-- name: Install Remi epel package
-  yum:
-    name: "https://rpms.remirepo.net/enterprise/remi-release-7.rpm"
+# - name: Install Remi epel package
+#   yum:
+#     name: "https://rpms.remirepo.net/enterprise/remi-release-7.rpm"
 
-- name: Enable Remi PHP RPM repository
-  command: yum-config-manager --enable remi-php80
+# - name: Enable Remi PHP RPM repository
+#   command: yum-config-manager --enable remi-php80
 
 - name: Install PHP dependencies
-  yum:
+  ansible.builtin.dnf:
     name:
-      - php-cli
-      - php-gd
-      - php-intl
-      - php-mbstring
-      - php-pecl-redis
-      - php-pecl-zendopcache
-      - php-pgsql
-      - php-soap
-      - php-xml
-      - php-zip
-  notify: PHP changed
+      - "php{{ php_version }}-cli"
+      - "php{{ php_version }}-gd"
+      - "php{{ php_version }}-intl"
+      - "php{{ php_version }}-mbstring"
+      - "php{{ php_version }}-pgsql"
+      - "php{{ php_version }}-soap"
+      - "php{{ php_version }}-xml"
+      - "php{{ php_version }}-zip"]
+      - php-pear
+      - composer
+
+- name: Install pecl packages.
+  ansible.builtin.command: pecl install {{ item }}
+  with_items:
+    - zip
+    - redis
+    - ZendOpcache
+  ignore_errors: yes
 
 - name: Download composer
   get_url:

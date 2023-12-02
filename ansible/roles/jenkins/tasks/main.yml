@@ -50,8 +50,9 @@
     key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
 
 - name: Install Jenkins
-  yum:
+  ansible.builtin.dnf:
     name: jenkins
+    disable_gpg_check: true
 
 # TODO: Drop “Remove Jenkins user .pgpass” after a successful provision.
 - name: Remove Jenkins user .pgpass
@@ -217,11 +218,7 @@
 
 # Must reload configuration for changes to take effect
 - name: Restart Jenkins
-  command:
-    java -jar "{{ jenkins_jar }}"
-    -auth @{{ jenkins_base_path }}/jenkins-cli-auth
-    -s "http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/"
-    safe-restart
+  command: service jenkins restart
   when: not skip_restart
 
 - import_tasks: wait.yml

@@ -5,18 +5,22 @@
 #     name: python3
 #     state: absent
 
-- name: Install package for CentOS SCL repository
-  yum:
-    name:
-      - centos-release-scl
-      # Required by the Ansbile pip module.
-      - python-setuptools
+# - name: Install package for CentOS SCL repository
+#   yum:
+#     name:
+#       - centos-release-scl
+#       # Required by the Ansbile pip module.
+#       - python3-setuptools
 
-- name: Install Python 3.8
-  yum:
-    name:
-      - rh-python38-python
-      - rh-python38-python-devel
-      # Workaround https://github.com/ansible/ansible/issues/47361
-      # Python setuptools is required to run the pip Ansible task.
-      - rh-python38-python-setuptools
+# - name: Install Python 3.8
+#   yum:
+#     name:
+#       - rh-python38-python
+#       - rh-python38-python-devel
+#       # Workaround https://github.com/ansible/ansible/issues/47361
+#       # Python setuptools is required to run the pip Ansible task.
+#       - rh-python38-python-setuptools
+
+- name: Install python tools
+  ansible.builtin.dnf:
+    name: python3-setuptools

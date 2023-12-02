@@ -2,7 +2,7 @@
 - name: Install base packages
   yum:
     name:
-      - centos-release-scl  # Clang and LLVM toolsets.
+#      - centos-release-scl  # Clang and LLVM toolsets.
       - https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 
 - name: Install PostgreSQL

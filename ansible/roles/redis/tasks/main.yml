@@ -1,23 +1,23 @@
 ---
 - name: Install Redis
-  yum:
-    name: redis
+  ansible.builtin.dnf:
+    name: redis6
 
 - name: Allow external Redis access
   lineinfile:
-    path: /etc/redis.conf
+    path: /etc/redis6/redis6.conf
     regexp: "^bind\\b"
     line: bind 0.0.0.0
   notify: Restart Redis
 
-- name: Override redis.service
+- name: Override redis6.service
   copy:
     src: override.conf
-    dest: /etc/systemd/system/redis.service.d/
+    dest: /etc/systemd/system/redis6.service.d/
   notify: Reload systemd
 
 - name: Start and enable Redis
   systemd:
-    name: redis
+    name: redis6
     state: started
     enabled: yes
