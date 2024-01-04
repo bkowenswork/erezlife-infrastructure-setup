@@ -1,0 +1,17 @@
+---
+vpcName: us-production
+vpcTags: "{'name':'eRezLife US Production'}"
+vpcCIDR: 172.17.0.0/16
+subnets:
+  - cidr: 172.17.0.0/24
+    name: Public1
+    type: IGW
+  - cidr: 172.17.1.0/24
+    name: Private1
+    type: NAT
+  - cidr: 172.17.2.0/24
+    name: Private2
+    type: NAT    
+  - cidr: 172.17.3.0/24
+    name: Public2
+    type: IGW  
