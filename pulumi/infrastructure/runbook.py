@@ -1,7 +1,7 @@
 import pulumi
 import pulumi_aws as aws
 
-def createRunbook(runbookName, repoName, repoOwner, repoBranch, tokenInfo, ansiblePath, playbookFile, targetTag, runbookRegion):
+def createRunbook(region, runbookName, repoName, repoOwner, repoBranch, tokenInfo, ansiblePath, playbookFile, targetTag):
 
     SourceInfo = f"{{'owner':'{repoOwner}','repository':'{repoName}','path':'{ansiblePath}','getOptions':'{repoBranch}','tokenInfo':'{tokenInfo}'}}"
 
@@ -22,4 +22,4 @@ def createRunbook(runbookName, repoName, repoOwner, repoBranch, tokenInfo, ansib
         values=['True'],
     )]
 
-    aws.ssm.Association(runbookName, association_name = runbookName, name = documentName, parameters = params, targets = target, opts=pulumi.ResourceOptions(provider=runbookRegion))
+    aws.ssm.Association(runbookName, association_name = runbookName, name = documentName, parameters = params, targets = target, opts=pulumi.ResourceOptions(provider=region))
