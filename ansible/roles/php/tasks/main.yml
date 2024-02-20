@@ -16,7 +16,7 @@
       - "php{{ php_version }}-pgsql"
       - "php{{ php_version }}-soap"
       - "php{{ php_version }}-xml"
-      - "php{{ php_version }}-zip"]
+      - "php{{ php_version }}-zip"
       - php-pear
       - composer
 

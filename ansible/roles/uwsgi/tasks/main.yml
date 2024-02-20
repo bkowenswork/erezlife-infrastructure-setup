@@ -1,9 +1,13 @@
 ---
-- name: Install uWSGI
-  yum:
-    name:
-      - uwsgi
-  notify: Restart uWSGI
+# - name: Install uWSGI
+#   yum:
+#     name:
+#       - uwsgi
+#   notify: Restart uWSGI
+
+- name: Install uWSGI python package
+  ansible.builtin.pip:
+    name: uwsgi
 
 - name: Install uWSGI libraries
   yum:

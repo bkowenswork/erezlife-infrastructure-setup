@@ -4,21 +4,20 @@ import pulumi_aws as aws
 # Create an instance role
 def create_ssm_role():
     ec2_role = aws.iam.Role(
-        "managed-instance-role",
-        aws.iam.RoleArgs(
-            assume_role_policy=json.dumps({
-                "Version": "2012-10-17",
-                "Statement": {
-                    "Effect": "Allow",
-                    "Principal": {
-                        "Service": "ec2.amazonaws.com",
-                    },
-                    "Action": "sts:AssumeRole",
+        "instance-profile-role",
+        assume_role_policy=json.dumps({
+            "Version": "2012-10-17",
+            "Statement": {
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "ec2.amazonaws.com",
                 },
-            })
-        ),
-        name = "managed-instance-role",
-        tags = {'Name': 'managed-instance-role'}
+                "Action": "sts:AssumeRole",
+            },
+        })
+        ,
+        name="managed-instance-role",
+        tags={'Name': 'managed-instance-role'}
     )
 
     aws.iam.RolePolicyAttachment(
@@ -36,5 +35,5 @@ def create_ssm_role():
             policy_arn="arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
         ),
     )
-
-    return aws.iam.InstanceProfile("testProfile", role=ec2_role.name)
+    
+    return aws.iam.InstanceProfile("managedEC2Profile", role=ec2_role.name)

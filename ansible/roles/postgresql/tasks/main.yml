@@ -1,21 +1,22 @@
 ---
-- name: Install base packages
-  yum:
-    name:
-#      - centos-release-scl  # Clang and LLVM toolsets.
-      - https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+# - name: Install base packages
+#   yum:
+#     name:
+#       - centos-release-scl  # Clang and LLVM toolsets.
+#       - https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 
 - name: Install PostgreSQL
   yum:
     name:
       - "postgresql{{ postgresql_version }}"
-      - "postgresql{{ postgresql_version }}-devel"
+      - "postgresql{{ postgresql_version }}-server"
+      - "postgresql{{ postgresql_version }}-server-devel"
 
 - import_tasks: server.yml
   when: postgresql_server
 
-- name: Create links for current PostgreSQL version
-  file:
-    src:  "/usr/pgsql-{{ postgresql_version }}"
-    dest:  /usr/pgsql
-    state: link
+# - name: Create links for current PostgreSQL version
+#   file:
+#     src:  "/usr/pgsql-{{ postgresql_version }}"
+#     dest:  /usr/pgsql
+#     state: link

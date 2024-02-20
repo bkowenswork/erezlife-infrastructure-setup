@@ -1,5 +1,6 @@
 ---
-- hosts: "{{ web_target }}"
+- hosts: localhost
+  connection: local
   roles:
     - system
     - python3
