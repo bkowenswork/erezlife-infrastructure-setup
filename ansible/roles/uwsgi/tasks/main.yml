@@ -8,6 +8,9 @@
 - name: Install uWSGI libraries
   yum:
     name:
+      - '@Development Tools'
+      - python3-devel
+      - python3-pip
       - libcap-devel
       - libuuid-devel
       - openssl-devel
