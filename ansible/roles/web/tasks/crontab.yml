@@ -1,4 +1,9 @@
 ---
+- name: Install Crontab
+  yum:
+    name: https://rpmfind.net/linux/fedora/linux/releases/38/Everything/x86_64/os/Packages/c/crontabs-1.11-29.20190603git.fc38.noarch.rpm
+    state: present 
+
 - name: Setup crontab env
   cron:
     env: yes

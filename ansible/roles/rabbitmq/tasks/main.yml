@@ -1,22 +1,22 @@
 ---
-
 - name: Set up RabbitMQ repo
   copy:
     src: rabbitmq.repo
-    dest: /tmp/rabbitmq.repo
+    dest: /etc/yum.repos.d/rabbitmq.repo
     mode: 0644
 
 - name: Add repository
-  ansible.builtin.yum_repository:
-    name: rabbitmq
-    description: RabbitMQ repo
-    baseurl: /tmp/rabbitmq.repo
-    state: present
-    gpgcheck: no
- 
-- name: Install Erlang
-  yum: 
-    name: erlang
+  ansible.builtin.command: yum update -y
+
+- name: Install OpenSSL 1.1
+  yum:
+    name: https://rpmfind.net/linux/centos-stream/9-stream/AppStream/x86_64/os/Packages/compat-openssl11-1.1.1k-3.el9.x86_64.rpm
+    stage: present
+    
+# - name: Install erlang
+#   yum:
+#     name: https://github.com/rabbitmq/erlang-rpm/releases/download/v25.1.1/erlang-25.1.1-1.el9.x86_64.rpm
+#     stage: present
 
 - name: Install RabbitMQ
   yum:
