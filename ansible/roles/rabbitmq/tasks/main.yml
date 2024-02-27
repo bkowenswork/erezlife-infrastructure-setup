@@ -1,4 +1,23 @@
 ---
+
+- name: Set up RabbitMQ repo
+  copy:
+    src: rabbitmq.repo
+    dest: /tmp/rabbitmq.repo
+    mode: 0644
+
+- name: Add repository
+  ansible.builtin.yum_repository:
+    name: rabbitmq
+    description: RabbitMQ repo
+    baseurl: /tmp/rabbitmq.repo
+    state: present
+    gpgcheck: no
+ 
+- name: Install Erlang
+  yum: 
+    name: erlang
+
 - name: Install RabbitMQ
   yum:
     name: rabbitmq-server

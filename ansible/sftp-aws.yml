@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  connection: local
+  roles:
+    - role: erezadmin
+      erezadmin_allow_ssh_from_web: yes
+    - sftp

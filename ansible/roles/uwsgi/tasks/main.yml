@@ -1,10 +1,4 @@
 ---
-# - name: Install uWSGI
-#   yum:
-#     name:
-#       - uwsgi
-#   notify: Restart uWSGI
-
 - name: Install uWSGI libraries
   yum:
     name:
@@ -17,18 +11,16 @@
       # Used for routing support
       - pcre-devel
 
-- name: Install uWSGI python package
-  ansible.builtin.pip:
-    name: uwsgi
-
-- name: Install Emperor python package
-  ansible.builtin.pip:
-    name: emperor
+- name: Install uWSGI
+  yum:
+    name: https://rpmfind.net/linux/fedora/linux/development/rawhide/Everything/x86_64/os/Packages/u/uwsgi-2.0.24-1.fc40.x86_64.rpm
+    state: present      
+  notify: Restart uWSGI
 
 
 # - name: Define uWSGI facts to compile Python plugin (1/2)
 #   set_fact:
-#     uwsgi_python_version: 3.8
+#     uwsgi_python_version: 3.9
 #     uwsgi_version: "{{ uwsgi_version_cmd.stdout }}"
 
 # - name: Define uWSGI facts to compile Python plugin (2/2)
@@ -65,24 +57,3 @@
 
 # - name: Create uWSGI runtime variable data directory
 #   command: systemd-tmpfiles --create
-
-
-- name: Write uwsgi.ini
-  template:
-    src: uwsgi.ini.j2
-    dest: /etc/uwsgi.ini
-    mode: 0600
-  notify: Restart uWSGI
-
-- name: Write systemd service file
-  template:
-    src: systemd.j2
-    dest: /etc/systemd/system/uwsgi.service
-    mode: 0600
-  notify: Restart uWSGI
-
-- name: Enable uWSGI
-  systemd:
-    name: uwsgi
-    enabled: yes
-    state: started

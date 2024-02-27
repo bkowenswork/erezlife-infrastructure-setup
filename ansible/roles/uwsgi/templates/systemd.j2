@@ -6,7 +6,7 @@ After=syslog.target
 
 [Service]
 EnvironmentFile=-/etc/sysconfig/uwsgi
-ExecStart=/usr/sbin/uwsgi --ini /etc/uwsgi.ini --pidfile /run/uwsgi/uwsgi.pid --stats /run/uwsgi/stats.sock
+ExecStart=/usr/local/bin/uwsgi --ini /etc/uwsgi.ini --pidfile /run/uwsgi/uwsgi.pid --stats /run/uwsgi/stats.sock
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 Restart=always
