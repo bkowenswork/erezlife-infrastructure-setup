@@ -10,9 +10,9 @@
     name: MAILTO
     value: "{{ email }}"
 
-- name: Install crontab job
-  cron:
-    name: Refresh SimpleSAMLphp metadata
-    job: 'curl --silent "https://{{ hostvars[groups[proxy_target][0]].inventory_hostname }}/simplesaml/module.php/cron/cron.php?key={{ saml_cron_key }}&tag=daily"'
-    hour: '12'
-    minute: '30'
+# - name: Install crontab job
+#   cron:
+#     name: Refresh SimpleSAMLphp metadata
+#     job: 'curl --silent "https://{{ hostvars[groups[proxy_target][0]].inventory_hostname }}/simplesaml/module.php/cron/cron.php?key={{ saml_cron_key }}&tag=daily"'
+#     hour: '12'
+#     minute: '30'
