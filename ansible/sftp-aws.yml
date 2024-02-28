@@ -1,6 +1,10 @@
 ---
 - hosts: localhost
   connection: local
+
+  pre_tasks:
+    - shell: python3 scripts/get-credentials -c scripts/s3_config.json -b erezlife-credentials
+
   roles:
     - role: erezadmin
       erezadmin_allow_ssh_from_web: yes
