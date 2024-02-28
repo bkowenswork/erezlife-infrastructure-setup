@@ -25,7 +25,7 @@
 - name: Install pecl packages.
   ansible.builtin.command: pecl install {{ item }}
   with_items:
-    - zip
+    # - zip
     - redis
 
 - name: Download composer

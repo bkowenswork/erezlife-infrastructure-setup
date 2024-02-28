@@ -14,7 +14,7 @@
 - name: Install uWSGI
   yum:
     name: https://rpmfind.net/linux/fedora/linux/releases/37/Everything/x86_64/os/Packages/u/uwsgi-2.0.20-9.fc37.x86_64.rpm
-    state: present      
+    disable_gpgcheck_check: true      
   notify: Restart uWSGI
 
 - name: Git checkout
@@ -27,8 +27,6 @@
   command: "sh -c 'PYTHON=python3 uwsgi --build-plugin plugins/python core'"
   args:
     chdir: "/usr/src/uwsgi/"
-    # File is created by the next task. Skip task when the target exists.
-    creates: "{{ uwsgi_plugin_python_path }}"
 
 - name: Create uWSGI lib directory
   file:
