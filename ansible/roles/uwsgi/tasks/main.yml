@@ -1,6 +1,6 @@
 ---
 - name: Install uWSGI libraries
-  yum:
+  ansible.builtin.yum:
     name:
       - '@Development Tools'
       - python3-devel
@@ -10,12 +10,9 @@
       - openssl-devel
       # Used for routing support
       - pcre-devel
-
-- name: Install uWSGI
-  yum:
-    name: https://rpmfind.net/linux/fedora/linux/releases/37/Everything/x86_64/os/Packages/u/uwsgi-2.0.20-9.fc37.x86_64.rpm
-    disable_gpgcheck_check: true      
-  notify: Restart uWSGI
+      # Using specific version of uWSGI that's compatible with AL2023
+      - https://rpmfind.net/linux/fedora/linux/releases/37/Everything/x86_64/os/Packages/u/uwsgi-2.0.20-9.fc37.x86_64.rpm
+    disable_gpg_check: true
 
 - name: Git checkout
   ansible.builtin.git:
@@ -38,7 +35,7 @@
   copy:
     remote_src: yes
     src: "/usr/src/uwsgi/python_plugin.so"
-    dest: "/usr/lib64/uwsgi/python_plugin.so"    
+    dest: "/usr/lib64/uwsgi/python_plugin.so"
 
 - name: Create uWSGI runtime variable data directory
   command: systemd-tmpfiles --create
