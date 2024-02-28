@@ -9,6 +9,7 @@
 - name: Install PHP dependencies
   ansible.builtin.dnf:
     name:
+      - "php{{ php_version }}-devel"      
       - "php{{ php_version }}-cli"
       - "php{{ php_version }}-gd"
       - "php{{ php_version }}-intl"
@@ -19,14 +20,13 @@
       - "php{{ php_version }}-zip"
       - php-pear
       - composer
+      - "php{{ php_version }}-opcache"
 
 - name: Install pecl packages.
   ansible.builtin.command: pecl install {{ item }}
   with_items:
     - zip
     - redis
-    - ZendOpcache
-  ignore_errors: yes
 
 - name: Download composer
   get_url:
