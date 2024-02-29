@@ -1,5 +1,4 @@
 ---
-- import_tasks: credentials.yml
 - import_tasks: timestamps.yml
 - import_tasks: packages.yml
 - import_tasks: ../../web/tasks/sudoers.yml

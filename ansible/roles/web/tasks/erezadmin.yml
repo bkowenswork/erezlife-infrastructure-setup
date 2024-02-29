@@ -2,6 +2,13 @@
 - include_vars: roles/web/files/uservoice.yml
 - include_vars: roles/web/files/sentry.yml
 
+- name: Gather EC2 metadata facts
+  amazon.aws.ec2_metadata_facts:
+
+- name: Set aws region
+  ansible.builtin.set_fact:
+    aws_region: "{{ ansible_ec2_instance_identity_document_region }}"
+
 - name: Make SSH connections non-interactive
   copy:
     src: erezadmin_ssh_config
