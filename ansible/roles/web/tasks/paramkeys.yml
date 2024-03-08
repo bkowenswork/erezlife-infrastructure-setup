@@ -1,0 +1,20 @@
+---
+- name: Lookup {{ item.name }} in AWS SSM Parameter Store
+  community.aws.aws_ssm_lookup:
+    name: "/paramkeys/{{ item.name }}"
+    decrypt: True
+  register: ssm_password
+  ignore_errors: True
+
+- name: Generate random password if not found in AWS SSM
+  ansible.builtin.set_fact:
+    password: "{{ lookup('password', '/dev/null length=item.size chars=ascii_letters,digits') }}"
+  when: ssm_password is failed
+
+- name: Store new password in AWS SSM Parameter Store
+  community.aws.aws_ssm:
+    name: "/paramkeys/{{ item.name }}"
+    value: "{{ password }}"
+    type: "SecureString"
+    state: present
+  when: ssm_password is failed

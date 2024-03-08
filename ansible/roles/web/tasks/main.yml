@@ -1,4 +1,5 @@
 ---
+- import_tasks: passkeys.yml
 - import_tasks: packages.yml
 - import_tasks: system_users.yml
 - import_tasks: system_paths.yml

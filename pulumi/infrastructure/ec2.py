@@ -39,6 +39,13 @@ def build_instances(instances, vpcData, region, amiId, ssmProfile, secGroupIds, 
         #             values=[f"{instance['instanceName']}"],
         #         )],
         #     opts=pulumi.InvokeOptions(provider=region))
+        instanceName = f"{instance['instanceName']}-{vpcData['vpcRegion']}"
+        userdata = """#!/bin/bash
+            sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+            sudo systemctl enable amazon-ssm-agent
+            sudo systemctl start amazon-ssm-agent
+            IPADDRESS=$(hostname -I | cut -d' ' -f1)
+            aws ssm put-parameter --region us-east-1 --name {0} --value $IPADDRESS --type "String" --overwrite"""
         
         instance = aws.ec2.Instance(f"{instance['instanceName']}-{vpcData['vpcRegion']}",
             ami=amiId,
@@ -50,9 +57,6 @@ def build_instances(instances, vpcData, region, amiId, ssmProfile, secGroupIds, 
             iam_instance_profile=ssmProfile.id,
             subnet_id=vpc['privateSubnet1'],
             # disable_api_termination = True,
-            user_data="""#!/bin/bash
-            sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-            sudo systemctl enable amazon-ssm-agent
-            sudo systemctl start amazon-ssm-agent""",
+            user_data=userdata.format(instanceName),
             opts=pulumi.ResourceOptions(provider=region)
         )

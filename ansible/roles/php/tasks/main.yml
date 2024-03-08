@@ -27,6 +27,7 @@
   with_items:
     # - zip
     - redis
+  ignore_errors: true
 
 - name: Download composer
   get_url:

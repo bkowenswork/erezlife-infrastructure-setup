@@ -2,6 +2,11 @@
 - include_vars: roles/web/files/uservoice.yml
 - include_vars: roles/web/files/sentry.yml
 
+- name: Set the proxy target IP
+  set_fact:
+    proxy_target: "{{ lookup('aws_ssm', '/env/app', region='eu-west-1' }}"
+
+
 - name: Gather EC2 metadata facts
   amazon.aws.ec2_metadata_facts:
 

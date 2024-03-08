@@ -35,5 +35,13 @@ def create_ssm_role():
             policy_arn="arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
         ),
     )
-    
+
+    aws.iam.RolePolicyAttachment(
+        "paramstore-role-policy-attachment",
+        aws.iam.RolePolicyAttachmentArgs(
+            role=ec2_role.name,
+            policy_arn="arn:aws:iam::aws:policy/AmazonSSMFullAccess"
+        ),
+    )
+
     return aws.iam.InstanceProfile("managedEC2Profile", role=ec2_role.name)
