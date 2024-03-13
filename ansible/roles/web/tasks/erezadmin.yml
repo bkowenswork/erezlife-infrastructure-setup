@@ -11,10 +11,10 @@
 
 - name: Set the proxy target IP
   set_fact:
-    proxy_target: "{{ lookup('aws_ssm', 'erezlife-proxy-useast', region=aws_region }}"
-    erezadmin_auth_token: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_auth_token', region=aws_region }}"
-    erezadmin_broker_password: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_broker_password', region=aws_region }}"
-    erezlife_github_webhook_secret: "{{ lookup('aws_ssm', '/paramkeys/erezlife_github_webhook_secret', region=aws_region }}"
+    proxy_target: "{{ lookup('aws_ssm', 'erezlife-proxy-us-east-1', region=aws_region) }}"
+    erezadmin_auth_token: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_auth_token', region=aws_region) }}"
+    erezadmin_broker_password: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_broker_password', region=aws_region) }}"
+    erezlife_github_webhook_secret: "{{ lookup('aws_ssm', '/paramkeys/erezlife_github_webhook_secret', region=aws_region) }}"
     erezadmin_secret_key: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_secret_key', region=aws_region) }}"
 
 - name: Make SSH connections non-interactive

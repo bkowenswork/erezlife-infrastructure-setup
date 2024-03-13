@@ -2,7 +2,7 @@
     "debug": {{ debug | to_json }},
     "email": "{{ email }}",
     "secret_key": "{{ erezadmin_secret_key }}",
-    "allowed_hosts": ["{{ hostvars[groups[proxy_target][0]].inventory_hostname }}"],
+    "allowed_hosts": ["{{ proxy_target }}"],
     "country_code": "{{ erezadmin_country_code }}",
     "tmp": "/opt/erezadmin/tmp",
     "database": {
@@ -15,8 +15,8 @@
     "hosts": {
         "cache": "{{ cache_host }}",
         "config": "{{ config_host }}",
-        "proxy": "{{ hostvars[groups[proxy_target][0]].ansible_host }}",
-        "sftp": "{{ hostvars[groups[sftp_target][0]].ansible_host }}",
+        "proxy": "{{ proxy_target }}",
+        "sftp": "{{ sftp_target }}",
         "web": "{{ ansible_host }}"
     },
     "erezadmin_broker_host": "amqp://erezadmin:{{ erezadmin_broker_password }}@localhost/erezadmin",
