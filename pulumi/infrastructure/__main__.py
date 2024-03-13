@@ -3,6 +3,7 @@ import vpc
 import ec2
 import iam
 import s3
+import paramkeys
 import rds
 import runbook
 import pulumi_aws as aws
@@ -32,6 +33,10 @@ caGroupIds = ec2.create_sg(secGroups, cacentral1, 'ca-central-1', caVpc)
 # CREATE THE S3 BUCKETS
 S3Config = utils.read_config("./files/prod-S3buckets.yaml")
 bucketConfig = s3.create_bucket(S3Config)
+
+# CREATE THE PARAMKEYS
+paramConfig = utils.read_config("./files/paramkeys.yaml")
+paramkeys.create_keys(paramConfig,awseast1)
 
 # CREATE THE EC2 INSTANCES
 ssmProfile = iam.create_ssm_role()

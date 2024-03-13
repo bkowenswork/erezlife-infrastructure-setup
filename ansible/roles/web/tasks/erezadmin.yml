@@ -2,17 +2,20 @@
 - include_vars: roles/web/files/uservoice.yml
 - include_vars: roles/web/files/sentry.yml
 
-- name: Set the proxy target IP
-  set_fact:
-    proxy_target: "{{ lookup('aws_ssm', '/env/app', region='eu-west-1' }}"
-
-
 - name: Gather EC2 metadata facts
   amazon.aws.ec2_metadata_facts:
 
 - name: Set aws region
   ansible.builtin.set_fact:
     aws_region: "{{ ansible_ec2_instance_identity_document_region }}"
+
+- name: Set the proxy target IP
+  set_fact:
+    proxy_target: "{{ lookup('aws_ssm', 'erezlife-proxy-useast', region=aws_region }}"
+    erezadmin_auth_token: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_auth_token', region=aws_region }}"
+    erezadmin_broker_password: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_broker_password', region=aws_region }}"
+    erezlife_github_webhook_secret: "{{ lookup('aws_ssm', '/paramkeys/erezlife_github_webhook_secret', region=aws_region }}"
+    erezadmin_secret_key: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_secret_key', region=aws_region) }}"
 
 - name: Make SSH connections non-interactive
   copy:
