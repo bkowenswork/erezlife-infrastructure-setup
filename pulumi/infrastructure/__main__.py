@@ -38,16 +38,16 @@ bucketConfig = s3.create_bucket(S3Config)
 paramConfig = utils.read_config("./files/paramkeys.yaml")
 paramkeys.create_keys(paramConfig,awseast1)
 
+# CREATE THE DATABASES
+rdsConfig = utils.read_config("./files/prod-databases.yaml")
+rds.build_instances(rdsConfig, usConfig, awseast1, usGroupIds, usVpc)
+# rds.build_instances(rdsConfig, caConfig, cacentral1, caGroupIds, caVpc)
+
 # CREATE THE EC2 INSTANCES
 ssmProfile = iam.create_ssm_role()
 instances = utils.read_config("./files/instances.yaml")
 ec2.build_instances(instances, usConfig, awseast1, 'ami-079db87dc4c10ac91', ssmProfile, usGroupIds, usVpc)
 # ec2.build_instances(instances, cacentral1, 'ami-0fe6c9864169f4e41', 'ca-central-1', ssmProfile, usSubnet, usGroupIds)
-
-# CREATE THE DATABASES
-# rdsConfig = utils.read_config("./files/prod-databases.yaml")
-# rds.build_instances(rdsConfig, usConfig, awseast1, usGroupIds)
-# rds.build_instances(rdsConfig, caConfig, cacentral1, caGroupIds)
 
 runBooks = utils.read_config("./files/runbooks.yaml") 
 for association in runBooks['associations']:

@@ -3,18 +3,17 @@ import ssm
 import pulumi_aws as aws
 
 # Create five EC2 instances
-def build_instances(databases, vpcData, region, dbSecGroupId): 
-
-    subnet1id = ssm.GetIdFromSSM(f"/sandbox/{vpcData['vpcEnvironment']}/{vpcData['vpcRegion']}/{vpcData['vpcName']}/subnets/private1", region)
-    subnet2id = ssm.GetIdFromSSM(f"/sandbox/{vpcData['vpcEnvironment']}/{vpcData['vpcRegion']}/{vpcData['vpcName']}/subnets/private2", region)
+def build_instances(databases, vpcData, region, dbSecGroupId, vpc): 
     # regionName = aws.get_region(opts=pulumi.InvokeOptions(provider=region))
     rdsInstances = []
 
     for database in databases['databases']:
         if database['region'] == vpcData['vpcRegion']:
 
+            # ssm.AddIdToSSM(f"{database['rdsName']}", f"/paramkeys/{database['rdsName']}",f"{database['password']}", databases['ec2Tags'], f"{vpcData['vpcRegion']}") <--- Failed to create 'str' object has no attribute 'package'
+
             dbSubnetGroup = aws.rds.SubnetGroup(f"{vpcData['vpcEnvironment']}-{database['region']}-{database['rdsName']}".lower(),  
-                            subnet_ids=[ subnet1id,subnet2id],
+                            subnet_ids=[ vpc['privateSubnet1'],vpc['privateSubnet2']],
                             tags={
                                 "Name": f"{vpcData['vpcEnvironment']}-{database['region']}".lower(),
                             })
@@ -26,7 +25,7 @@ def build_instances(databases, vpcData, region, dbSecGroupId):
                 engine_version=database['engine_version'],
                 instance_class="db.t3.medium",
                 # parameter_group_name="default.postgresql13",
-                password="foobarbaz",
+                password=database['password'],
                 skip_final_snapshot=True,
                 publicly_accessible=True,
                 db_subnet_group_name=dbSubnetGroup.id,
