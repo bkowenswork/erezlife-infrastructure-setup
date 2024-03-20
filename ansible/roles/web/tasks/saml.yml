@@ -13,6 +13,11 @@
     owner: erezlife
     group: erezlife
 
+- name: Set saml vars 
+  set_fact:
+    saml_owner: erezadmin
+    saml_path: /usr/share/php/simplesamlphp    
+
 - name: Install SimpleSAMLphp dependencies
   become_user: "{{ saml_owner }}"
   composer:

@@ -1,8 +1,8 @@
 ---
 - include_tasks: ssh_keyscan.yml
   loop:
-    - "{{ hostvars[groups[proxy_target][0]].ansible_host }}"
-    - "{{ hostvars[groups[sftp_target][0]].ansible_host }}"
+    - "{{ lookup('aws_ssm', 'erezlife-proxy-us-east-1', region=aws_region) }}"
+    - "{{ lookup('aws_ssm', 'erezlife-sftp-us-east-1', region=aws_region) }}"
   loop_control:
     loop_var: host
 

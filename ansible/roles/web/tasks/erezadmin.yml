@@ -19,7 +19,12 @@
     erezadmin_secret_key: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_secret_key', region=aws_region) }}"
     erezadmin_database_password: "{{ lookup('aws_ssm', 'us-production-db-us-east-1', region=aws_region) }}"
     database_host: "{{ lookup('aws_ssm', 'us-production-db-endpoint', region=aws_region) }}"
-    cache_host: "us-cache.8nkwof.0001.use1.cache.amazonaws.com"
+    aws_backup_bucket: "sandbox-production-erezlife-us-backups"
+    aws_sftp_bucket: "sandbox-production-erezlife-ca-sftp"
+    aws_upload_bucket: "sandbox-production-erezlife-us-upload"
+    aws_tmp_bucket: "sandbox-production-erezlife-ca-tmp"
+    aws_lambda_namespace: "sandbox-erezlife"
+    aws_log_group: "/sandbox-us-erezlife"
 
 - name: Make SSH connections non-interactive
   copy:
