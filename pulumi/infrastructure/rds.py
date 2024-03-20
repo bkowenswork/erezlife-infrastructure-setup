@@ -10,8 +10,6 @@ def build_instances(databases, vpcData, region, dbSecGroupId, vpc):
     for database in databases['databases']:
         if database['region'] == vpcData['vpcRegion']:
 
-            # ssm.AddIdToSSM(f"{database['rdsName']}", f"/paramkeys/{database['rdsName']}",f"{database['password']}", databases['ec2Tags'], f"{vpcData['vpcRegion']}") <--- Failed to create 'str' object has no attribute 'package'
-
             dbSubnetGroup = aws.rds.SubnetGroup(f"{vpcData['vpcEnvironment']}-{database['region']}-{database['rdsName']}".lower(),  
                             subnet_ids=[ vpc['privateSubnet1'],vpc['privateSubnet2']],
                             tags={
@@ -33,6 +31,24 @@ def build_instances(databases, vpcData, region, dbSecGroupId, vpc):
                 username="foo",
                 opts=pulumi.ResourceOptions(provider=region))
             
-            rdsInstances.append({f"{database['rdsName']}-{database['region']}" : rdsInstance.endpoint})
+            rdsEndpoint = rdsInstance.endpoint.apply(lambda v: f"{v}")
+            # rdsInstances.append({f"{database['rdsName']}-{database['region']}" : rdsInstance.endpoint})
+
+            ssm.AddIdToSSM(
+                        f"{database['rdsName']}-{database['region']}", 
+                        f"{database['rdsName']}-{database['region']}",
+                        database['password'], 
+                        databases['ec2Tags'], 
+                        region
+                    ) 
+
+            ssm.AddIdToSSM(
+                        f"{database['rdsName']}-endpoint", 
+                        f"{database['rdsName']}-endpoint",
+                        rdsEndpoint, 
+                        databases['ec2Tags'], 
+                        region
+                    ) 
+
 
     return rdsInstances

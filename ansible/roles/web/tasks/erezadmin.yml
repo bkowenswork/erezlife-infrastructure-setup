@@ -12,10 +12,14 @@
 - name: Set the proxy target IP
   set_fact:
     proxy_target: "{{ lookup('aws_ssm', 'erezlife-proxy-us-east-1', region=aws_region) }}"
+    sftp_target: "{{ lookup('aws_ssm', 'erezlife-sftp-us-east-1', region=aws_region) }}"
     erezadmin_auth_token: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_auth_token', region=aws_region) }}"
     erezadmin_broker_password: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_broker_password', region=aws_region) }}"
     erezlife_github_webhook_secret: "{{ lookup('aws_ssm', '/paramkeys/erezlife_github_webhook_secret', region=aws_region) }}"
     erezadmin_secret_key: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_secret_key', region=aws_region) }}"
+    erezadmin_database_password: "{{ lookup('aws_ssm', 'us-production-db-us-east-1', region=aws_region) }}"
+    database_host: "{{ lookup('aws_ssm', 'us-production-db-endpoint', region=aws_region) }}"
+    cache_host: "us-cache.8nkwof.0001.use1.cache.amazonaws.com"
 
 - name: Make SSH connections non-interactive
   copy:
