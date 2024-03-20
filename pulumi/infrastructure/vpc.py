@@ -68,6 +68,26 @@ def create_vpc(vpcData, vpcRegion):
             vpc.update({f"privateSubnet{private_nets}": private_subnet.id}) 
             ssm.AddIdToSSM(f"{vpcData['vpcName']}-private{private_nets}", f"/sandbox/{vpcData['vpcEnvironment']}/{vpcData['vpcRegion']}/{vpcData['vpcName']}/subnets/private{private_nets}", private_subnet.id, tagged|{"Name":f"{vpcData['vpcName']}"}, vpcRegion)   
     # return privSubnet
+
+    # populating parameter store with basic stack values
+    ssm.AddIdToSSM(
+        f"{vpcData['vpcAccount']}-{vpcData['vpcName']}", 
+        f"{vpcData['vpcAccount']}-{vpcData['vpcName']}",
+        f"{vpcData['vpcAccount']}", 
+        tagged|{"Name":f"{vpcData['vpcAccount']}"}, 
+        vpcRegion)   
+    ssm.AddIdToSSM(
+        f"{vpcData['vpcEnvironment']}-{vpcData['vpcName']}", 
+        f"{vpcData['vpcEnvironment']}-{vpcData['vpcName']}",
+        f"{vpcData['vpcEnvironment']}", 
+        tagged, 
+        vpcRegion)      
+    ssm.AddIdToSSM(
+        f"{vpcData['vpcRegion']}-{vpcData['vpcName']}", 
+        f"{vpcData['vpcRegion']}-{vpcData['vpcName']}",
+        f"{vpcData['vpcRegion']}", 
+        tagged, 
+        vpcRegion)   
     return vpc        
 
 

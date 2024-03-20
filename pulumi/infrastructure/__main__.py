@@ -6,6 +6,7 @@ import s3
 import paramkeys
 import rds
 import runbook
+import cloudwatch
 import pulumi_aws as aws
 
 # SET UP YOUR REGION PROVIDERS
@@ -33,6 +34,10 @@ caGroupIds = ec2.create_sg(secGroups, cacentral1, 'ca-central-1', caVpc)
 # CREATE THE S3 BUCKETS
 S3Config = utils.read_config("./files/prod-S3buckets.yaml")
 bucketConfig = s3.create_bucket(S3Config)
+
+# CREATE THE CLOUDWATCH GROUPS
+usLogGroups = cloudwatch.create_group(usConfig, awseast1)
+caLogGroups = cloudwatch.create_group(caConfig, cacentral1)
 
 # CREATE THE PARAMKEYS
 paramConfig = utils.read_config("./files/paramkeys.yaml")
