@@ -142,19 +142,19 @@
     -s "http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/"
     install-plugin "{{ item }}" -deploy
   loop:
-    - basic-branch-build-strategies
-    - build-token-root
-    - copyartifact
-    - email-ext
-    - git
-    - github-branch-source
-    - github-scm-trait-notification-context
-    - greenballs
+    - basic-branch-build-strategies:71.vc1421f89888e
+    - build-token-root:151.va_e52fe3215fc
+    - copyartifact:1.48
+    - email-ext:2.102
+    - git:4.14.3
+    - github-branch-source:1696.v3a_7603564d04
+    - github-scm-trait-notification-context:1.1
+    - greenballs:1.15.1
     - mailer
-    - PrioritySorter
-    - throttle-concurrents
-    - workflow-aggregator
-    - ws-cleanup
+    - PrioritySorter:4.1.0
+    - throttle-concurrents:2.1
+    - workflow-aggregator:596.v8c21c963d92d
+    - ws-cleanup:0.43
 
 - name: Copy configuration files
   copy:
