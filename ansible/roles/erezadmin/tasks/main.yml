@@ -6,6 +6,17 @@
     generate_ssh_key: true
     ssh_key_comment: "erezadmin@{{ inventory_hostname }}"
 
+- name: Gather EC2 metadata facts
+  amazon.aws.ec2_metadata_facts:
+
+- name: Set aws region
+  ansible.builtin.set_fact:
+    aws_region: "{{ ansible_ec2_instance_identity_document_region }}"
+
+- name: Set the erezadmin key
+  set_fact:
+    erezadmin_key: "{{ lookup('aws_ssm', '/paramkeys/erezadmin_secret_key', region=aws_region) }}"
+
 - name: Authorize erezadmin user to SSH from Jenkins
   template:
     src: authorized_keys.j2

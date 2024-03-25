@@ -53,7 +53,7 @@ $config = [
      * external url, no matter where you come from (direct access or via the
      * reverse proxy).
      */
-    'baseurlpath' => 'https://{{ hostvars[groups[proxy_target][0]].inventory_hostname }}/simplesaml/',
+    'baseurlpath' => 'https://{{ proxy_target }}/simplesaml/',
 
     /*
      * The 'application' configuration array groups a set configuration options

@@ -1,7 +1,9 @@
 ---
-- name: Install s3fs
+- name: Install s3fs deps
   yum:
-    name: s3fs-fuse
+    name: 
+      - libxml-devel
+      - openssl-devel
 
 - name: Configure s3fs credentials
   copy:

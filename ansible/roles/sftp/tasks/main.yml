@@ -31,10 +31,10 @@
 
 - import_tasks: s3fs.yml
 
-- name: Reboot server weekly
-  cron:
-    name: Reboot server weekly
-    job: /usr/sbin/reboot
-    weekday: "2"
-    hour: "22"
-    minute: "18"
+# - name: Reboot server weekly
+#   cron:
+#     name: Reboot server weekly
+#     job: /usr/sbin/reboot
+#     weekday: "2"
+#     hour: "22"
+#     minute: "18"

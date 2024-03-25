@@ -1,4 +1,4 @@
 {{ lookup('file', '../../jenkins/files/ssh/id_rsa.pub') }}
 {% if erezadmin_allow_ssh_from_web -%}
-    {{ hostvars[groups[web_target][0]].erezadmin_key }}
+    {{ erezadmin_key }}
 {% endif %}

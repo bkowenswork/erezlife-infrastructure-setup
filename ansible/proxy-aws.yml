@@ -2,8 +2,15 @@
 - hosts: localhost
   connection: local
 
+- name: Include vars from all group
+  ansible.builtin.include_vars:
+    file: ../../group_vars/all/all.yaml
+    name: group_vars
+
   pre_tasks:
     - shell: python3 scripts/get-credentials -c scripts/s3_config.json -b erezlife-credentials
+    - shell: dnf install python3-pip -y
+    - shell: pip install boto3    
 
   roles:
     - role: erezadmin
