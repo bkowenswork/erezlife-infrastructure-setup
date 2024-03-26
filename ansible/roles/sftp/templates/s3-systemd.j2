@@ -1,0 +1,14 @@
+[Unit]
+Description=Mountpoint for Amazon S3 mount
+Wants=network.target
+AssertPathIsDirectory=/home/clients
+
+[Service]
+Type=forking
+User=clients
+Group=clients
+ExecStart=/usr/bin/mount-s3 {{ sftp_bucket }} /home/clients
+ExecStop=/usr/bin/fusermount -u /home/clients
+
+[Install]
+WantedBy=remote-fs.target
