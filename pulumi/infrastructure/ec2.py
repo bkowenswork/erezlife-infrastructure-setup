@@ -41,6 +41,7 @@ def build_instances(instances, vpcData, region, amiId, ssmProfile, secGroupIds, 
         #     opts=pulumi.InvokeOptions(provider=region))
         instanceName = f"{instance['instanceName']}-{vpcData['vpcRegion']}"
         userdata = """#!/bin/bash
+            sudo hostnamectl set-hostname {0}
             sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
             sudo systemctl enable amazon-ssm-agent
             sudo systemctl start amazon-ssm-agent

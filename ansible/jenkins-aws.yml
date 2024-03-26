@@ -1,5 +1,11 @@
 ---
-- hosts: jenkins
+- hosts: localhost
+  connection: local
+
+  pre_tasks:
+    - shell: python3 scripts/get-credentials -c scripts/s3_config.json -b erezlife-credentials
+    - shell: dnf install python3-pip -y
+    - shell: pip install boto3    
   roles:
     - common
     - ssh_access
