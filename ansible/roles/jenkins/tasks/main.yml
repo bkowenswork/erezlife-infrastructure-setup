@@ -96,6 +96,10 @@
     dest: /etc/sysconfig/jenkins
     mode: 0600
 
+- name: Set jenkins secret
+  ansible.builtin.set_fact:
+    jenkins_token: "cookies_are_good"
+
 - name: Copy config files and credentials
   template:
     src: "{{ item }}.j2"
@@ -218,8 +222,9 @@
 
 # Must reload configuration for changes to take effect
 - name: Restart Jenkins
-  command: service jenkins restart
-  when: not skip_restart
+  ansible.builtin.service:
+    name: jenkins
+    state: restarted
 
 - import_tasks: wait.yml
 

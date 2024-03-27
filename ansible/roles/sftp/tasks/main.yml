@@ -18,7 +18,7 @@
 - name: Create 'clients' user
   ansible.builtin.user:
     name: clients
-    shell: /usr/sbin/nologin
+    groups: clients
     create_home: yes
 
 - name: Copy sshd_config

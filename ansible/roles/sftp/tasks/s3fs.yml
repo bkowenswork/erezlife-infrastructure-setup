@@ -2,12 +2,13 @@
 - name: Install s3 deps
   yum:
     name: 
-      - libxml-devel
+      - libxml2-devel
       - openssl-devel
 
 - name: Install s3 mount  
   yum:
     name: https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.rpm    
+    disable_gpg_check: true
 
 - name: S3 mount startup script
   template:

@@ -11,5 +11,5 @@
     enabled: yes
     state: started
 
-- name: Install Python Docker bindings (for Ansible)
-  ansible.builtin.command: pip3 install docker
+# - name: Install Python Docker bindings (for Ansible)
+#   ansible.builtin.command: pip3 install docker

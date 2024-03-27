@@ -1,4 +1,8 @@
 ---
+- name: Include bors variables
+  include_vars:
+    file: ../../../group_vars/jenkins/passwords.yml
+
 - name: Start bors-ng
   docker_container:
     container_default_behavior: no_defaults

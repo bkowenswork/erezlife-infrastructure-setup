@@ -7,7 +7,7 @@ AssertPathIsDirectory=/home/clients
 Type=forking
 User=clients
 Group=clients
-ExecStart=/usr/bin/mount-s3 {{ sftp_bucket }} /home/clients
+ExecStart=/usr/bin/mount-s3 {{ sftp_bucket }} /home/clients --allow-overwrite 
 ExecStop=/usr/bin/fusermount -u /home/clients
 
 [Install]
